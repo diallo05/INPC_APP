@@ -61,14 +61,18 @@ class PointOfSale(models.Model):
     commune = models.ForeignKey(Commune, on_delete=models.CASCADE)
     
     def save(self, *args, **kwargs):
-        if not self.gps_lat or not self.gps_lon:
-            # Supposons que `commune` a une adresse ou une ville
-            address = self.commune.get_full_address()  # Assurez-vous que la commune peut renvoyer une adresse
-            lat, lon = get_lat_lon_from_address(address)
-            if lat and lon:
-                self.gps_lat = lat
-                self.gps_lon = lon
-        super().save(*args, **kwargs)
+        # Utilisation de Geopy pour obtenir la latitude et la longitude à partir de l'adresse (localisation)
+        geolocator = Nominatim(user_agent="myGeocoder")
+        location = geolocator.geocode(self.code)
+
+        if location:
+            self.gps_lat = location.latitude
+            self.gps_lon = location.longitude
+        else:
+            self.latitude = None
+            self.longitude = None
+
+        super(PointOfSale, self).save(*args, **kwargs)
 
 
 
