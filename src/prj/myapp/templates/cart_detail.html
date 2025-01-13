@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}Module{% endblock %}
+
+{% block content %}
+
+<h1 class="text-center">Details of Carts</h1>
+<ul class="list-group p-5">
+    <li class="list-group-item"><b>ID</b>: {{ cart.id }}</li>
+    <li class="list-group-item"><b>Code</b>: {{ cart.code }}</li>
+    <li class="list-group-item"><b>Name</b>: {{ cart.name }}</li>
+    <li class="list-group-item"><b>Description</b>: {{ cart.description }}</li>
+</ul>
+
+{% endblock %}

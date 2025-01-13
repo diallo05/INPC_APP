@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}Module{% endblock %}
+{% load static %}
+{% block content %}
+    <!-- Section avec un titre et du texte -->
+    <div class="container text-center mt-4">
+        <h1>Bienvenue sur notre site</h1>
+        <p class="lead">Suivez vos paniers et vos produits, et calculez l'indice des prix facilement.</p>
+    </div>
+
+    <!-- Carrousel d'images -->
+    <div id="carouselExampleIndicators" class="carousel slide mt-4" data-bs-ride="carousel">
+        <div class="carousel-indicators">
+            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1" aria-label="Slide 2"></button>
+            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2" aria-label="Slide 3"></button>
+        </div>
+        <div class="carousel-inner">
+            <div class="carousel-item active">
+                <img src="{% static 'image1.jpeg' %}" class="d-block w-100" alt="Image 1">
+            </div>
+            <div class="carousel-item">
+                <img src="{% static 'image2.jpeg' %}" class="d-block w-100" alt="Image 2">
+            </div>
+            <div class="carousel-item">
+                <img src="{% static 'image3.jpeg' %}" class="d-block w-100" alt="Image 3">
+            </div>
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
+    </div>
+
+    <!-- Animation lors du scroll -->
+    <div class="container text-center mt-5" data-aos="fade-up">
+        <h2>Suivez facilement vos produits</h2>
+        <p>Notre site vous permet de gérer et suivre vos produits en temps réel.</p>
+    </div>
+
+    <!-- Boutons d'action -->
+    <div class="text-center mt-4">
+        <a href="{% url 'product_list' %}" class="btn btn-primary btn-lg">Voir les Produits</a>
+        <a href="{% url 'cart_list' %}" class="btn btn-success btn-lg">Voir le Panier</a>
+    </div>
+
+    <!-- Inclure les animations lors du scroll -->
+    <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+    <script>
+        AOS.init(); // Initialisation des animations au défilement
+    </script>
+
+{% endblock %}

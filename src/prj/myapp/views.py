@@ -4,76 +4,192 @@ from django.shortcuts import render
 from django.shortcuts import render
 from django.views.generic import ListView, DetailView , CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy, reverse
-from .models import Produit, PointVente, Panier, ProduitPanier, ProduitPointVente, Indice
+from .models import *
 
 # Create your views here.
 
+def home(request):
+    return render(request, 'home.html')
 class productListView(ListView):
-    model=Produit
-    template_name='test.html'
+    model=Product
+    template_name='product_list.html'
     context_object_name='product_list'
 
 class productDetailView(DetailView):
-    model=Produit
+    model=Product
     template_name='product_detail.html'
     context_object_name='product'
 
 class productCreateView(CreateView):
-    model=Produit
+    model=Product
     template_name='product_form.html'
     fields='__all__'
     success_url = reverse_lazy('product_list')
 
 class productUpdateView(UpdateView):
-    model=Produit
+    model=Product
     template_name='product_form.html'
     fields='__all__'
 
 class productDeleteView(DeleteView):
-    model=Produit
+    model=Product
     template_name='product_confirm_delete.html'
     success_url='/'
 class pointVenteListView(ListView):
-    model=PointVente
+    model=PointOfSale
     template_name='pointvente_list.html'
     context_object_name='pointVente_list'
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['count_communes'] = count_communes()  # Calcul du nombre de communes
-        context['count_categories'] = count_categories()  # Calcul du nombre de catégories
-        context['count_total_pointvente'] = count_total_pointvente()  # Total des points de vente
-        return context
-
 class pointVenteDetailView(DetailView):
-    model=PointVente
+    model=PointOfSale
     template_name='pointVente_detail.html'
     context_object_name='pointVente'
 
 class pointVenteCreateView(CreateView):
-    model=PointVente
-    template_name='pointVente_form.html'
+    model=PointOfSale
+    template_name='pointvente_form.html'
     fields='__all__'
     success_url = reverse_lazy('pointVente_list')
 
 class pointVenteUpdateView(UpdateView):
-    model=PointVente
+    model=PointOfSale
     template_name='pointVente_form.html'
     fields='__all__'
 
 class pointVenteDeleteView(DeleteView):
-    model=PointVente
+    model=PointOfSale
     template_name='pointVente_confirm_delete.html'
     success_url='/'
 
-# Fonction pour compter le nombre de catégories distinctes
-def count_categories():
-    return PointVente.objects.values('categorie').distinct().count()
+class wilayaListView(ListView):
+    model=Wilaya
+    template_name='commune_list.html'
+    context_object_name='wilaya_list'
 
-# Fonction pour compter le nombre de communes distinctes
-def count_communes():
-    return PointVente.objects.values('commune').distinct().count()
+class wilayaDetailView(DetailView): 
+    model=Wilaya
+    template_name='wilaya_detail.html'
+    context_object_name='wilaya'
 
-# Fonction pour compter le nombre total de PointVente
-def count_total_pointvente():
-    return PointVente.objects.count()
+class wilayaCreateView(CreateView):
+    model=Wilaya
+    template_name='wilaya_form.html'
+    fields='__all__'
+    success_url = reverse_lazy('pointVente_list')
+
+class wilayaUpdateView(UpdateView):
+    model=Wilaya
+    template_name='wilaya_form.html'
+    fields='__all__'    
+
+class wilayaDeleteView(DeleteView):
+    model=Wilaya
+    template_name='wilaya_confirm_delete.html'
+    success_url='/'
+
+class moughataaListView(ListView):
+    model=Moughataa
+    template_name='moughataa_list.html'
+    context_object_name='moughataa_list'
+
+class moughataaDetailView(DetailView):
+    model=Moughataa
+    template_name='moughataa_detail.html'
+    context_object_name='moughataa'
+
+class moughataaCreateView(CreateView):
+    model=Moughataa
+    template_name='moughataa_form.html'
+    fields='__all__'
+    success_url = reverse_lazy('pointVente_list')
+
+class moughataaUpdateView(UpdateView):  
+    model=Moughataa
+    template_name='moughataa_form.html'
+    fields='__all__'
+
+class moughataaDeleteView(DeleteView):
+    model=Moughataa
+    template_name='moughataa_confirm_delete.html'
+    success_url='/'
+
+class communeListView(ListView):
+    model=Commune
+    template_name='commune_list.html'
+    context_object_name='commune_list'  
+
+class communeDetailView(DetailView):
+    model=Commune
+    template_name='commune_detail.html'
+    context_object_name='commune'
+
+class communeCreateView(CreateView):
+    model=Commune
+    template_name='commune_form.html'
+    fields='__all__'
+    success_url = reverse_lazy('commune_list')
+
+class communeUpdateView(UpdateView):
+    model=Commune
+    template_name='commune_form.html'
+    fields='__all__'
+
+class communeDeleteView(DeleteView):
+    model=Commune
+    template_name='commune_confirm_delete.html'
+    success_url='/'
+
+class productTypeListView(ListView):
+    model=ProductType
+    template_name='producttype_list.html'
+    context_object_name='productType_list'
+
+class productTypeDetailView(DetailView):
+    model=ProductType
+    template_name='producttype_detail.html'
+    context_object_name='productType'
+
+class productTypeCreateView(CreateView):
+    model=ProductType
+    template_name='producttype_form.html'
+    fields='__all__'
+    success_url = reverse_lazy('productType_list')
+
+class productTypeUpdateView(UpdateView):
+    model=ProductType
+    template_name='producttype_form.html'
+    fields='__all__'
+
+class productTypeDeleteView(DeleteView):
+    model=ProductType
+    template_name='producttype_confirm_delete.html'
+    success_url='/'
+
+class CartView(ListView):
+    model=Cart
+    template_name='cart_list.html'
+    context_object_name='cart_list'
+
+class CartDetailView(DetailView):
+    model=Cart
+    template_name='cart_detail.html'
+    context_object_name='cart'
+
+class CartCreateView(CreateView):
+    model=Cart
+    template_name='cart_form.html'
+    fields='__all__'
+    success_url = reverse_lazy('cart_list')
+
+class CartUpdateView(UpdateView):        
+    model=Cart
+    template_name='cart_form.html'
+    fields='__all__'
+
+class CartDeleteView(DeleteView):    
+    model=Cart
+    template_name='cart_confirm_delete.html'
+    success_url='/'
+
+
+

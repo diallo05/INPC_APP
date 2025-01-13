@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "myapp",
 ]
 
 MIDDLEWARE = [
@@ -79,7 +80,7 @@ DATABASES = {
         'NAME': 'prix',
         "USER": "django_user",
         "PASSWORD": "django_password",
-        "HOST": "db",
+        "HOST": "mydb",
         "PORT": "3306",
         "CHARSET": "UTF8",
         'OPTIONS': {
