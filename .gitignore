@@ -169,3 +169,8 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+
+db/mysql.sock
+db/mysql.sock.lock
+db/mysql.sock.lock.lock
