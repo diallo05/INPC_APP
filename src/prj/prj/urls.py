@@ -40,4 +40,5 @@ urlpatterns = [
     path("cart/new/", CartCreateView.as_view(), name="cart_new"),
     path("cart/edit/<int:pk>/", CartUpdateView.as_view(), name="cart_edit"),
     path("cart/delete/<int:pk>/", CartDeleteView.as_view(), name="cart_delete"),
+    path('import/wilayas', import_wilaya_csv, name='wilaya_import'),
 ]

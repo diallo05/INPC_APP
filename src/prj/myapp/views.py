@@ -5,6 +5,7 @@ from django.shortcuts import render
 from django.views.generic import ListView, DetailView , CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy, reverse
 from .models import *
+from django.http import HttpResponseRedirect
 
 # Create your views here.
 
@@ -191,5 +192,30 @@ class CartDeleteView(DeleteView):
     template_name='cart_confirm_delete.html'
     success_url='/'
 
+def import_wilaya_csv(request):
+    if "GET" == request.method:
+        return render(request, "csv_import.html", {'oname': "wilaya", 'opath': "wilayas"})
+    try:
+        object_list = []
+        csv_file = request.FILES["formFile"]
+        file_data = csv_file.read().decode("utf-8")
+        lines = file_data.split("\n")
+        for line in lines:			
+            fields = line.split(",")
+            if len(fields) < 3:
+                print('Hello!')
+                continue
+            ob = Wilaya()
+            ob.id = fields[0]
+            ob.code = fields[1]
+            ob.name = fields[2]
+            object_list.append(ob)
+        
+        Wilaya.objects.bulk_create(object_list)
 
+    except Exception as e:
+        print("Error! Unable to upload file. " + repr(e))
+        return HttpResponseRedirect(reverse("wilaya_import"))
+
+    return HttpResponseRedirect(reverse("commune_list"))
 

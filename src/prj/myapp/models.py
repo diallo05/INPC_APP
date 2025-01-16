@@ -25,7 +25,7 @@ class Product(models.Model):
 
 class Wilaya(models.Model):
     id = models.AutoField(primary_key=True)
-    code = models.CharField(max_length=2)
+    code = models.CharField(max_length=4)
     name = models.CharField(max_length=252)
 
     def __str__(self):
