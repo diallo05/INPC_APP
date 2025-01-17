@@ -202,20 +202,59 @@ def import_wilaya_csv(request):
         lines = file_data.split("\n")
         for line in lines:			
             fields = line.split(",")
-            if len(fields) < 3:
-                print('Hello!')
+            if len(fields) < 3 or not fields[0].isdigit():
                 continue
             ob = Wilaya()
-            ob.id = fields[0]
-            ob.code = fields[1]
-            ob.name = fields[2]
+            ob.id = int(fields[0])
+            ob.code = fields[1].strip()
+            ob.name = fields[2].strip()
             object_list.append(ob)
         
-        Wilaya.objects.bulk_create(object_list)
+        Wilaya.objects.bulk_create(object_list, ignore_conflicts=True)
+        print(f"Successfully imported {len(object_list)} objects.")
 
     except Exception as e:
-        print("Error! Unable to upload file. " + repr(e))
+        print(f"Error! Unable to upload file: {e}")
         return HttpResponseRedirect(reverse("wilaya_import"))
 
-    return HttpResponseRedirect(reverse("commune_list"))
+    return HttpResponseRedirect(reverse("wilaya_list"))
+
+def import_moughata_csv(request):
+    if "GET" == request.method:
+        return render(request, "csv_import.html", {'oname': "moughata", 'opath': "moughataas"})
+    try:
+        object_list = []
+        csv_file = request.FILES["formFile"]
+        file_data = csv_file.read().decode("utf-8")
+        lines = file_data.split("\n")
+        for line in lines:
+            fields = line.split(",")
+            if len(fields) < 4 or not fields[0].isdigit():
+                continue
+            ob = Moughataa()
+            ob.id = int(fields[0])
+            ob.code = fields[1].strip()
+            ob.label = fields[2].strip()
+            
+            # Trouver la wilaya correspondante
+            try:
+                wilaya = Wilaya.objects.get(name=fields[3].strip())
+                ob.wilaya = wilaya
+            except Wilaya.DoesNotExist:
+                print(f"Wilaya not found: {fields[3].strip()}")
+                continue
+            
+            object_list.append(ob)
+        
+        # Sauvegarder les objets dans la table Moughataa
+        Moughataa.objects.bulk_create(object_list, ignore_conflicts=True)
+        print(f"Successfully imported {len(object_list)} objects.")
+
+    except Exception as e:
+        print(f"Error! Unable to upload file: {e}")
+        return HttpResponseRedirect(reverse("moughata_import"))
+
+    return HttpResponseRedirect(reverse("wilaya_list"))
+
+
 
