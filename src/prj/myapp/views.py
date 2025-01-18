@@ -11,6 +11,8 @@ from django.http import HttpResponseRedirect
 
 def home(request):
     return render(request, 'home.html')
+
+
 class productListView(ListView):
     model=Product
     template_name='product_list.html'
@@ -41,6 +43,32 @@ class pointVenteListView(ListView):
     template_name='pointvente_list.html'
     context_object_name='pointVente_list'
 
+class ProductpriceListView(ListView):
+    model=ProductPrice
+    template_name='products.html'
+    context_object_name='productprice_list'
+class ProductpriceDetailView(DetailView):
+    model=ProductPrice
+    template_name='productprice_detail.html'
+    context_object_name='productprice'
+
+class ProductpriceCreateView(CreateView):
+    model=ProductPrice
+    template_name='productprice_form.html'
+    fields='__all__'
+    success_url = reverse_lazy('product_list')
+class ProductpriceUpdateView(UpdateView):
+    model=ProductPrice
+    template_name='productprice_form.html'
+    fields='__all__'
+
+class ProductpriceDeleteView(DeleteView):
+    model=ProductPrice
+    template_name='productprice_confirm_delete.html'
+    success_url='/'
+
+
+
 class pointVenteDetailView(DetailView):
     model=PointOfSale
     template_name='pointVente_detail.html'
@@ -63,9 +91,16 @@ class pointVenteDeleteView(DeleteView):
     success_url='/'
 
 class wilayaListView(ListView):
-    model=Wilaya
-    template_name='commune_list.html'
-    context_object_name='wilaya_list'
+    model = Wilaya
+    template_name = 'wilaya_map.html'
+    context_object_name = 'wilaya_list'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Chemin vers le fichier GeoJSON des wilayas
+        context['wilayas_geojson'] = 'static/geojson/wilayas.geojson'
+        return context
+
 
 class wilayaDetailView(DetailView): 
     model=Wilaya
@@ -191,6 +226,8 @@ class CartDeleteView(DeleteView):
     model=Cart
     template_name='cart_confirm_delete.html'
     success_url='/'
+
+
 
 def import_wilaya_csv(request):
     if "GET" == request.method:

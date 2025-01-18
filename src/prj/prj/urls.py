@@ -10,6 +10,11 @@ urlpatterns = [
     path("product/new/", productCreateView.as_view(), name="product_new"),
     path("product/edit/<int:pk>/", productUpdateView.as_view(), name="product_edit"),
     path("product/delete/<int:pk>/", productDeleteView.as_view(), name="product_delete"),
+    path("productprice/list", ProductpriceListView.as_view(), name="productprice_list"),
+    path("productprice/<int:pk>/", ProductpriceDetailView.as_view(), name="productprice_detail"),
+    path("productprice/new/", ProductpriceCreateView.as_view(), name="productprice_new"),
+    path("productprice/edit/<int:pk>/", ProductpriceUpdateView.as_view(), name="productprice_edit"),
+    path("productprice/delete/<int:pk>/", ProductpriceDeleteView.as_view(), name="productprice_delete"),
     path("pointVente/list", pointVenteListView.as_view(), name="pointVente_list"),
     path("pointVente/<int:pk>/", pointVenteDetailView.as_view(), name="pointVente_detail"),
     path("pointVente/new/", pointVenteCreateView.as_view(), name="pointVente_new"),
@@ -42,4 +47,5 @@ urlpatterns = [
     path("cart/delete/<int:pk>/", CartDeleteView.as_view(), name="cart_delete"),
     path('import/wilayas', import_wilaya_csv, name='wilaya_import'),
     path('import/moughataas', import_moughata_csv, name='moughata_import'),
+    
 ]
