@@ -32,13 +32,30 @@
                     <a class="nav-link active" href="/">Home</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'product_list' %}">Produit</a>
+                    <a class="nav-link" href="{% url 'productprice_list' %}">Produit</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'pointVente_list' %}">Point Vente</a>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="{% url 'productprice_list' %}" id="dropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Produits
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                        <li><a class="dropdown-item" href="{% url 'product_list' %}">List Produit</a></li>
+                        <li><a class="dropdown-item" href="{% url 'productprice_list' %}">List Prix</a></li>
+                        <li><a class="dropdown-item" href="{% url 'pointVente_list' %}">Point vente</a></li>
+                    </ul>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'cart_list' %}">Panier</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="dropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Structure
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                        <li><a class="dropdown-item" href="{% url 'wilaya_list' %}">Wilaya</a></li>
+                        <li><a class="dropdown-item" href="{% url 'moughataa_list' %}">Wilaya</a></li>
+                        <li><a class="dropdown-item" href="{% url 'commune_list' %}">Moughataas</a></li>
+                    </ul>
                 </li>
             </ul>
         </div>

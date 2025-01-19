@@ -47,5 +47,6 @@ urlpatterns = [
     path("cart/delete/<int:pk>/", CartDeleteView.as_view(), name="cart_delete"),
     path('import/wilayas', import_wilaya_csv, name='wilaya_import'),
     path('import/moughataas', import_moughata_csv, name='moughata_import'),
-    
+    path("dashboard/", dashboard, name="dashboard"),
+    path('import/communes', import_csv_commune, name='commune_import'),
 ]
