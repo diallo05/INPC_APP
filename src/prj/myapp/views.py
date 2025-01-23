@@ -10,7 +10,7 @@ from django.http import HttpResponseRedirect
 # Create your views here.
 
 def home(request):
-    return render(request, 'home.html')
+    return render(request, 'base.html')
 
 
 class productListView(ListView):
@@ -33,6 +33,7 @@ class productUpdateView(UpdateView):
     model=Product
     template_name='product_form.html'
     fields='__all__'
+    success_url = reverse_lazy('product_list')
 
 class productDeleteView(DeleteView):
     model=Product
@@ -40,12 +41,12 @@ class productDeleteView(DeleteView):
     success_url='/'
 class pointVenteListView(ListView):
     model=PointOfSale
-    template_name='pointvente_list.html'
+    template_name='pointvente.html'
     context_object_name='pointVente_list'
 
 class ProductpriceListView(ListView):
     model=ProductPrice
-    template_name='products.html'
+    template_name='productprice_list.html'
     context_object_name='productprice_list'
 class ProductpriceDetailView(DetailView):
     model=ProductPrice
@@ -71,7 +72,7 @@ class ProductpriceDeleteView(DeleteView):
 
 class pointVenteDetailView(DetailView):
     model=PointOfSale
-    template_name='pointVente_detail.html'
+    template_name='pointvente_detail.html'
     context_object_name='pointVente'
 
 class pointVenteCreateView(CreateView):
@@ -92,19 +93,12 @@ class pointVenteDeleteView(DeleteView):
 
 class wilayaListView(ListView):
     model = Wilaya
-    template_name = 'wilaya_map.html'
+    template_name = 'wilaya_list.html'
     context_object_name = 'wilaya_list'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        # Chemin vers le fichier GeoJSON des wilayas
-        context['wilayas_geojson'] = 'static/geojson/wilayas.geojson'
-        return context
-
 
 class wilayaDetailView(DetailView): 
     model=Wilaya
-    template_name='wilaya_detail.html'
+    template_name='wilaya_details.html'
     context_object_name='wilaya'
 
 class wilayaCreateView(CreateView):
@@ -182,7 +176,7 @@ class productTypeListView(ListView):
 
 class productTypeDetailView(DetailView):
     model=ProductType
-    template_name='producttype_detail.html'
+    template_name='producttype_details.html'
     context_object_name='productType'
 
 class productTypeCreateView(CreateView):
@@ -208,7 +202,7 @@ class CartView(ListView):
 
 class CartDetailView(DetailView):
     model=Cart
-    template_name='cart_detail.html'
+    template_name='cart_details.html'
     context_object_name='cart'
 
 class CartCreateView(CreateView):
@@ -371,3 +365,57 @@ def import_csv_commune(request):
     return HttpResponseRedirect(reverse("commune_list"))
 
 
+def import_producttype(request):
+    if "GET" == request.method:
+        return render(request, "csv_import.html", {'oname': "producttype", 'opath': "producttypes"})
+    try:
+        object_list = []
+        csv_file = request.FILES["formFile"]
+        file_data = csv_file.read().decode("utf-8")
+        lines = file_data.split("\n")
+        for line in lines:
+            fields = line.split(",")
+            if len(fields) < 4 or not fields[0].isdigit():
+                continue
+            ob = ProductType()
+            ob.code = fields[1].strip()
+            ob.label = fields[2].strip()
+            ob.description=fields[3].strip()
+            object_list.append(ob)
+        ProductType.objects.bulk_create(object_list, ignore_conflicts=True)
+        print(f"Successfully imported {len(object_list)} objects.")
+    except Exception as e:
+        print(f"Error! Unable to upload file: {e}")
+        return HttpResponseRedirect(reverse("producttype_import"))
+    return HttpResponseRedirect(reverse("product_list"))
+
+def import_product(request):
+    if "GET" == request.method:
+        return render(request, "csv_import.html", {'oname': "product", 'opath': "products"})
+    try:
+        object_list = []
+        csv_file = request.FILES["formFile"]
+        file_data = csv_file.read().decode("utf-8")
+        lines = file_data.split("\n")
+        for line in lines:
+            fields = line.split(",")
+            if len(fields) < 4 or not fields[0].isdigit():
+                continue
+            ob = Product()
+            ob.code = fields[1].strip()
+            ob.name = fields[2].strip()
+            ob.description=fields[3].strip()
+            ob.unit_measure=fields[4].strip()
+            try:
+                producttype = Product.objects.get(label=fields[5].strip())
+                ob.product_type = producttype
+            except ProductType.DoesNotExist:
+                print(f"Moughataa not found: {fields[5].strip()}")
+                continue
+            object_list.append(ob)
+        Commune.objects.bulk_create(object_list, ignore_conflicts=True)
+        print(f"Successfully imported {len(object_list)} objects.")
+    except Exception as e:
+        print(f"Error! Unable to upload file: {e}")
+        return HttpResponseRedirect(reverse("import_product"))
+    return HttpResponseRedirect(reverse("product_list"))

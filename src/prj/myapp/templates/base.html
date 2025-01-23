@@ -1,74 +1,361 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    ...
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-    ...
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ANSADE</title>
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"
+  />
+  <style>
+    :root {
+      font-family: "Roboto", sans-serif;
+      box-sizing: border-box;
+      --primary-color: #10a248; /* Vert foncé */
+      --secondary-color: #127126; /* Vert plus foncé */
+      --accent-color: #cccccc; /* Gris clair */
+      --background-color: #f4f4f4; /* Fond gris clair */
+      --footer-bg-color: #003300; /* Fond vert très foncé */
+      --text-color: #333; /* Couleur de texte principale */
+      --white: #ffffff; /* Blanc */
+    }
 
+    *,
+    *::before,
+    *::after {
+      box-sizing: inherit;
+      margin: 0;
+      padding: 0;
+    }
 
-    <title>{% block title %}Mon Site{% endblock %}</title>
-    <!-- Lien vers le CSS de Bootstrap 5 -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    {% load static %}
-    <!-- Lien vers les styles personnalisés -->
-    <link rel="stylesheet" href="{% static 'styles.css' %}">
+    body {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      background-color: #fffbfb;
+      color: var(--text-color);
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: var(--primary-color);
+      color: #d1c714;
+      padding: 1rem 2rem;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .header .logo img {
+      height: 60px;
+      margin-right: 1rem;
+    }
+
+    .header .title {
+      text-align: center;
+      font-size: 1.2rem;
+      margin: 0;
+    }
+
+    .header .title span {
+      display: block;
+      font-size: 1rem;
+      font-weight: normal;
+    }
+
+    .header .title strong {
+      display: block;
+      font-size: 1.4rem;
+      font-weight: bold;
+      margin-top: 0.25rem;
+    }
+
+    .header .social {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .header .social a {
+      color: var(--white);
+      text-decoration: none;
+      font-size: 1.5rem;
+      transition: color 0.3s;
+    }
+
+    .header .social a:hover {
+      color: var(--accent-color);
+    }
+
+    /* Navbar */
+    .navbar {
+      background-color: var(--secondary-color);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .navbar a {
+      color: var(--white);
+      text-decoration: none;
+      font-size: 1.1rem;
+      transition: color 0.3s;
+      position: relative;
+    }
+
+    .navbar a::after {
+      content: '';
+      position: absolute;
+      bottom: -5px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background-color: var(--accent-color);
+      transition: width 0.3s ease;
+    }
+
+    .navbar a:hover::after {
+      width: 100%;
+    }
+
+    /* Dropdown */
+    .nav-item.dropdown {
+      position: relative;
+    }
+
+    .dropdown-menu {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      background-color: var(--secondary-color);
+      border-radius: 4px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+    }
+
+    .dropdown-menu a {
+      color: var(--white);
+      padding: 0.5rem 1rem;
+      display: block;
+      text-decoration: none;
+      transition: background-color 0.3s ease;
+    }
+
+    .dropdown-menu a:hover {
+      background-color: var(--primary-color);
+    }
+
+    .nav-item.dropdown:hover .dropdown-menu {
+      display: block;
+    }
+
+    /* Contenu principal */
+    .content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 2rem;
+      background-color: var(--white);
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      margin: 2rem;
+    }
+
+    .content h1 {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      color: #eb1b1b;
+    }
+
+    .content p {
+      font-size: 1.2rem;
+      margin-bottom: 2rem;
+      color: #555;
+    }
+
+    /* Bouton de connexion */
+    .btn-login {
+      background-color: #eb1b1b;
+      color: var(--white);
+      padding: 1rem 2rem;
+      text-decoration: none;
+      border-radius: 5px;
+      font-size: 1.2rem;
+      display: inline-block;
+      transition: background-color 0.3s, transform 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-login::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 300%;
+      height: 300%;
+      background-color: rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      transition: transform 0.5s ease;
+    }
+
+    .btn-login:hover::after {
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    .btn-login:active {
+      transform: scale(0.95);
+    }
+
+    /* Footer */
+    .footer {
+      background-color: #10a248;
+      color: var(--white);
+      text-align: center;
+      padding: 1rem;
+      margin-top: auto;
+    }
+
+    .footer p {
+      margin: 0;
+      animation: fadeInUp 1s ease;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .navbar {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .content {
+        margin: 1rem;
+      }
+    }
+  </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo03" aria-controls="navbarTogglerDemo03" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <a class="navbar-brand" href="#">
-            <img src="{% static 'logo.png' %}" alt="Logo" width="150">
-        </a>
-        
-        <div class="collapse navbar-collapse" id="navbarTogglerDemo03">
-            <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
-                <li class="nav-item">
-                    <a class="nav-link active" href="/">Home</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'productprice_list' %}">Produit</a>
-                </li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="{% url 'productprice_list' %}" id="dropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        Produits
-                    </a>
-                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-                        <li><a class="dropdown-item" href="{% url 'product_list' %}">List Produit</a></li>
-                        <li><a class="dropdown-item" href="{% url 'productprice_list' %}">List Prix</a></li>
-                        <li><a class="dropdown-item" href="{% url 'pointVente_list' %}">Point vente</a></li>
-                    </ul>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'cart_list' %}">Panier</a>
-                </li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="dropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        Structure
-                    </a>
-                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-                        <li><a class="dropdown-item" href="{% url 'wilaya_list' %}">Wilaya</a></li>
-                        <li><a class="dropdown-item" href="{% url 'moughataa_list' %}">Wilaya</a></li>
-                        <li><a class="dropdown-item" href="{% url 'commune_list' %}">Moughataas</a></li>
-                    </ul>
-                </li>
-            </ul>
-        </div>
+  <header class="header">
+    <!-- Logo -->
+    <div class="logo">
+      <img
+        src="https://ansade.mr/wp-content/uploads/2021/08/ANSADE-Vector-Logo-Whilte-Background-PNG-3.png"
+        alt="Logo de l'ansade"
+      />
+    </div>
+
+    <!-- Réseaux sociaux -->
+    <nav class="social" aria-label="Liens vers les réseaux sociaux">
+      <a href="https://ansade.mr/fr/" aria-label="Flux RSS"><i class="fa fa-rss"></i></a>
+      <a href="https://web.facebook.com/ansade.rim" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+      <a href="https://ansade.mr/fr/#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+      <a href="https://www.linkedin.com/" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+      <a href="https://www.economie.gov.mr/ar" aria-label="Version Arabe">العربية</a>
     </nav>
+  </header>
 
-    {% block content %}{% endblock %}
+  <!-- Navbar -->
+  <nav class="navbar">
+    <a href="{% url 'product_list' %}">Produit</a>
+    <a href="{% url 'pointVente_list' %}">Point Vente</a>
+    <a href="{% url 'cart_list' %}">Panier</a>
+    <li class="nav-item dropdown">
+      <a class="nav-link dropdown-toggle" href="#" id="dropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+          Structure
+      </a>
+      <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+          <li><a class="dropdown-item" href="{% url 'wilaya_list' %}">Wilaya</a></li>
+          <li><a class="dropdown-item" href="{% url 'moughataa_list' %}">Moughataa</a></li>
+          <li><a class="dropdown-item" href="{% url 'commune_list' %}">Commune</a></li>
+      </ul>
+    </li>
+  </nav>
 
-    <!-- Bas de page -->
-    <footer class="bg-light text-center py-3">
-        <p>&copy; 2025 Diallo. Tous droits réservés.</p>
-    </footer>
-    
-    <!-- Lien vers le JavaScript de Bootstrap 5 (inclus dans bootstrap.bundle.min.js) -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+  {% block content %}{% endblock %}
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>&copy; 2023 ANSADE. Tous droits réservés.</p>
+    <p>Nombre de visiteurs : <span id="visitor-count">0</span></p>
+  </footer>
+
+  <script>
+    // Animation pour le dropdown
+    const dropdownToggle = document.querySelector('.dropdown-toggle');
+    const dropdownMenu = document.querySelector('.dropdown-menu');
+
+    dropdownToggle.addEventListener('click', function (e) {
+      e.preventDefault();
+      dropdownMenu.style.display = dropdownMenu.style.display === 'block' ? 'none' : 'block';
+    });
+
+    // Effet de vague au clic sur le bouton
+    const btnLogin = document.querySelector('.btn-login');
+    if (btnLogin) {
+      btnLogin.addEventListener('click', function (e) {
+        e.preventDefault();
+        const ripple = document.createElement('span');
+        ripple.classList.add('ripple-effect');
+        ripple.style.left = e.offsetX + 'px';
+        ripple.style.top = e.offsetY + 'px';
+        this.appendChild(ripple);
+
+        setTimeout(() => {
+          ripple.remove();
+        }, 500);
+      });
+    }
+
+    // Animation pour le compteur de visiteurs
+    const visitorCount = document.getElementById('visitor-count');
+    if (visitorCount) {
+      visitorCount.style.opacity = 0;
+      visitorCount.style.transform = 'translateY(20px)';
+
+      setTimeout(() => {
+        visitorCount.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+        visitorCount.style.opacity = 1;
+        visitorCount.style.transform = 'translateY(0)';
+      }, 500);
+    }
+
+    // Compteur de visiteurs
+    if (localStorage.getItem('visitorCount') === null) {
+      localStorage.setItem('visitorCount', 0);
+    }
+
+    let count = parseInt(localStorage.getItem('visitorCount'));
+    count += 1;
+    localStorage.setItem('visitorCount', count);
+
+    if (visitorCount) {
+      visitorCount.textContent = count;
+    }
+  </script>
 </body>
 </html>

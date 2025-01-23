@@ -60,6 +60,8 @@ class PointOfSale(models.Model):
     gps_lon = models.FloatField()
     commune = models.ForeignKey(Commune, on_delete=models.CASCADE)
     
+    def __str__(self):
+        return self.type
     def save(self, *args, **kwargs):
         # Utilisation de Geopy pour obtenir la latitude et la longitude à partir de l'adresse (localisation)
         geolocator = Nominatim(user_agent="myGeocoder")
@@ -87,7 +89,7 @@ class ProductPrice(models.Model):
     point_of_sale = models.ForeignKey(PointOfSale, on_delete=models.CASCADE)
 
     def __str__(self):
-        return f"{self.product.name} - {self.value}"
+        return f"{self.product.name} - {self.value} - {self.point_of_sale}"
 
 
 class Cart(models.Model):

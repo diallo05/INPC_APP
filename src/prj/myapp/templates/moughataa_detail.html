@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+
+{% block title %}<title>Module</title>{% endblock %}
+
+{% block content %}
+
+<div class="container">
+  <h1 class="text-center my-5 text-primary">Détails du Moughataa</h1>
+  <ul class="list-group shadow-lg rounded p-4">
+    <li class="list-group-item d-flex justify-content-between align-items-center">
+      <b>ID</b>
+      <span>{{ moughataa.id }}</span>
+    </li>
+    <li class="list-group-item d-flex justify-content-between align-items-center">
+      <b>Code</b>
+      <span>{{ moughataa.code }}</span>
+    </li>
+    <li class="list-group-item d-flex justify-content-between align-items-center">
+      <b>name</b>
+      <span>{{ moughataa.label }}</span>
+    </li>
+    <li class="list-group-item d-flex justify-content-between align-items-center">
+      <b>Moughataa</b>
+      <span>{{ moughataa.wilaya }}</span>
+    </li>
+    
+  </ul>
+</div>
+
+<style>
+  /* Style général */
+  body {
+    background-color: #f8f9fa;
+    font-family: 'Arial', sans-serif;
+  }
+
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    padding: 2rem;
+  }
+
+  h1 {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #007bff;
+  }
+
+  .list-group-item {
+    font-size: 1.2rem;
+    border: none;
+    padding: 1rem 1.5rem;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+  }
+
+  .list-group-item:hover {
+    background-color: #f1f1f1;
+    transform: scale(1.02);
+  }
+
+  .list-group-item b {
+    color: #343a40;
+  }
+
+  .list-group-item span {
+    color: #6c757d;
+  }
+
+  /* Animation d'entrée */
+  .list-group-item {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInUp 0.5s ease forwards;
+  }
+
+  .list-group-item:nth-child(2) {
+    animation-delay: 0.1s;
+  }
+
+  .list-group-item:nth-child(3) {
+    animation-delay: 0.2s;
+  }
+
+  .list-group-item:nth-child(4) {
+    animation-delay: 0.3s;
+  }
+
+  .list-group-item:nth-child(5) {
+    animation-delay: 0.4s;
+  }
+
+  .list-group-item:nth-child(6) {
+    animation-delay: 0.5s;
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+</style>
+
+<script>
+  // Animation JS pour faire défiler la page vers le haut
+  document.addEventListener("DOMContentLoaded", function () {
+    const scrollToTopButton = document.createElement("button");
+    scrollToTopButton.textContent = "⬆️";
+    scrollToTopButton.style.position = "fixed";
+    scrollToTopButton.style.bottom = "20px";
+    scrollToTopButton.style.right = "20px";
+    scrollToTopButton.style.backgroundColor = "#007bff";
+    scrollToTopButton.style.color = "white";
+    scrollToTopButton.style.border = "none";
+    scrollToTopButton.style.borderRadius = "50%";
+    scrollToTopButton.style.width = "50px";
+    scrollToTopButton.style.height = "50px";
+    scrollToTopButton.style.fontSize = "1.5rem";
+    scrollToTopButton.style.cursor = "pointer";
+    scrollToTopButton.style.display = "none";
+    scrollToTopButton.style.boxShadow = "0 4px 10px rgba(0, 0, 0, 0.2)";
+    document.body.appendChild(scrollToTopButton);
+
+    // Afficher le bouton lors du défilement
+    window.addEventListener("scroll", function () {
+      if (window.scrollY > 200) {
+        scrollToTopButton.style.display = "block";
+      } else {
+        scrollToTopButton.style.display = "none";
+      }
+    });
+
+    // Remonter en haut de la page
+    scrollToTopButton.addEventListener("click", function () {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  });
+</script>
+
+{% endblock %}

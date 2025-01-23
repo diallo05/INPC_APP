@@ -1,39 +1,131 @@
 {% extends "base.html" %}
 
-{% block title %}<title>Insert PointVente</title>{% endblock %}
+{% block title %}<title>Insert Point of sales</title>{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header">
-                    <h1 class="text-center">Add a pointVente</h1>
-                </div>
-                <div class="card-body">
-                    <form action="" method="post" class="text-center">
-                        {% csrf_token %}
-                        {{ form.as_p }}
-                        <button type="submit" class="btn btn-primary">Save</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
+<div class="form-container">
+  <h1>Ajouter point de vente</h1>
+  <form action="" method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" class="btn-primary" value="Save" />
+  </form>
 </div>
 
+<style>
+  /* Style général pour le formulaire */
+  .form-container {
+    max-width: 600px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  }
 
+  .form-container h1 {
+    font-size: 2rem;
+    color: #006400;
+    margin-bottom: 1.5rem;
+    text-align: center;
+  }
+
+  .form-container label {
+    display: block;
+    font-size: 1rem;
+    color: #333;
+    margin-bottom: 0.5rem;
+  }
+
+  .form-container input,
+  .form-container textarea,
+  .form-container select {
+    width: 100%;
+    padding: 0.75rem;
+    margin-bottom: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+    background-color: #f9f9f9;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .form-container input:focus,
+  .form-container textarea:focus,
+  .form-container select:focus {
+    border-color: #006400;
+    box-shadow: 0 0 5px rgba(0, 100, 0, 0.5);
+    outline: none;
+  }
+
+  .form-container .btn-primary {
+    background-color: #006400;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  .form-container .btn-primary:hover {
+    background-color: #004d00;
+  }
+
+  .form-container .errorlist {
+    color: #ff0000;
+    list-style: none;
+    padding: 0;
+    margin-bottom: 1rem;
+  }
+
+  @media (max-width: 768px) {
+    .form-container {
+      padding: 1rem;
+    }
+
+    .form-container h1 {
+      font-size: 1.5rem;
+    }
+  }
+</style>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const form = document.querySelector("form");
+
+    form.addEventListener("submit", function (event) {
+      const inputs = form.querySelectorAll("input, textarea, select");
+      let isValid = true;
+
+      inputs.forEach((input) => {
+        if (input.value.trim() === "") {
+          isValid = false;
+          input.style.borderColor = "#ff0000";
+          const errorMessage = input.nextElementSibling;
+          if (!errorMessage || !errorMessage.classList.contains("error-message")) {
+            const error = document.createElement("div");
+            error.textContent = "Ce champ est obligatoire.";
+            error.style.color = "#ff0000";
+            error.classList.add("error-message");
+            input.insertAdjacentElement("afterend", error);
+          }
+        } else {
+          input.style.borderColor = "#ccc";
+          const errorMessage = input.nextElementSibling;
+          if (errorMessage && errorMessage.classList.contains("error-message")) {
+            errorMessage.remove();
+          }
+        }
+      });
+
+      if (!isValid) {
+        event.preventDefault();
+      } else {
+        alert("Le point de vente a été ajouté avec succès !");
+      }
+    });
+  });
+</script>
 {% endblock %}
-/* Add Bootstrap CSS to your project */
-
-.container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh; /* Make container fill the viewport height */
-}
-
-.card {
-    border-radius: 10px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}

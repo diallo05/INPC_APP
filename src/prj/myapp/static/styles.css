@@ -1,61 +1,180 @@
-/* Navbar styles */
-.navbar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    display: flex; /* Utilisation de Flexbox pour l'alignement */
-    align-items: center; /* Aligne les éléments verticalement */
-    justify-content: space-between; /* Espace entre le logo et les liens */
-    background-color: #333; /* Couleur de fond */
-    padding: 10px 20px;
-    color: white;
-    z-index: 1000;
-}
-
-.navbar .logo img {
-    height: 50px; /* Taille du logo */
-}
-
-.navbar nav ul {
-    list-style: none;
-    display: flex; /* Affiche les éléments horizontalement */
-    gap: 20px; /* Espacement entre les liens */
+:root {
+    font-family: "Inter", sans-serif;
+    box-sizing: border-box;
+  }
+  
+  *,
+  *::before,
+  *::after {
+    box-sizing: inherit;
     margin: 0;
     padding: 0;
-}
-
-.navbar nav ul li {
-    display: inline;
-}
-
-.navbar nav ul li a {
+  }
+  
+  body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+  
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #008000;
+    color: white;
+    padding: 1rem 2rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Ajustements pour le logo */
+  .header .logo {
+    background-color: white; /* Arrière-plan pour améliorer la visibilité */
+    padding: 0.5rem; /* Espace autour du logo */
+    border-radius: 8px; /* Bords arrondis */
+  }
+  
+  .header .logo img {
+    height: 60px; /* Ajustez la taille selon vos besoins */
+    width: auto; /* Garder les proportions */
+    object-fit: contain; /* Empêcher la déformation */
+  }
+  
+  .header .title {
+    text-align: center;
+    font-size: 1.2rem;
+    margin: 0;
+  }
+  
+  .header .title span {
+    display: block;
+    font-size: 1rem;
+    font-weight: normal;
+  }
+  
+  .header .title strong {
+    display: block;
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-top: 0.25rem;
+  }
+  
+  .header .social {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  
+  .header .social a {
     color: white;
     text-decoration: none;
-    font-weight: bold;
+    font-size: 1.5rem;
     transition: color 0.3s;
-    font-size: 16px;
-}
-
-.navbar nav ul li a:hover {
-    color: #ffcc00;
-}
-
-/* Main content styles */
-.main-content {
-    padding: 100px 20px; /* Ajoute un espace sous la navbar */
-}
-
-.stats {
+  }
+  
+  .header .social a:hover {
+    color: #cccccc;
+  }
+  
+  /* Navbar */
+  .navbar {
+    background-color: #006400;
+    padding: 1rem 2rem;
     display: flex;
-    gap: 20px;
-    flex-wrap: wrap;
-}
-
-.card {
-    background: #f4f4f4;
-    padding: 20px;
-    border-radius: 5px;
+    justify-content: center;
+    gap: 2rem;
+  }
+  
+  .navbar a {
+    color: white;
+    text-decoration: none;
+    font-size: 1.2rem;
+    transition: color 0.3s;
+  }
+  
+  .navbar a:hover {
+    color: #cccccc;
+  }
+  
+  /* Contenu principal */
+  .content {
     flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
     text-align: center;
-}
+    padding: 2rem;
+  }
+  
+  .content h1 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+  }
+  
+  .content p {
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+  }
+  
+  .btn-login {
+    background-color: #008000;
+    color: white;
+    padding: 1rem 2rem;
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 1.2rem;
+    display: inline-block;
+    transition: background-color 0.3s;
+  }
+  
+  .btn-login:hover {
+    background-color: #006400;
+  }
+  
+  .btn-login:active {
+    background-color: #004d00;
+  }
+  
+  /* Footer */
+  .footer {
+    background-color: #008000;
+    color: white;
+    text-align: center;
+    padding: 1rem;
+    margin-top: auto;
+    box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .footer p {
+    margin: 0;
+  }
+  
+  /* Accessibilité : Focus sur les liens */
+  .navbar a:focus,
+  .header .social a:focus {
+    outline: 2px solid #cccccc;
+  }
+  
+  /* Responsivité mobile */
+  @media (max-width: 768px) {
+    .header {
+      flex-direction: column;
+      text-align: center;
+    }
+  
+    .navbar {
+      flex-direction: column;
+      align-items: center;
+    }
+  
+    .content {
+      padding: 1rem;
+    }
+  
+    .btn-login {
+      width: 100%;
+      text-align: center;
+    }
+  }
+  
