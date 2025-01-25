@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}<title>PointSales</title>{% endblock %}
+{% block title %}<title>Cart</title>{% endblock %}
 
 {% block content %}
 <!-- CSS personnalisé -->
@@ -128,41 +128,37 @@
 
 <div class="py-2 d-grid gap-2 d-md-flex justify-content-md-end">
   <!-- Bouton Import avec icône -->
-  <a href="{% url 'import_moughataa' 'Moughataa' %}" class="btn btn-import btn-custom">
+  <a href="#" class="btn btn-import btn-custom">
     <i class="fas fa-download"></i> <!-- Icône de téléchargement -->
     Import
   </a>
-  <a href="{% url 'export_moughataa' 'Moughataa' %}" class="btn btn-export btn-custom">
-    <i class="fas fa-upload"></i> <!-- Icône de téléversement -->
-    Export
-</a>
   <!-- Bouton Add avec icône -->
-  <a href="{% url 'moughataa_new' %}" class="btn btn-primary-custom btn-custom">
+  <a href="{% url 'cartproduct_new' %}" class="btn btn-primary-custom btn-custom">
     <i class="fas fa-plus"></i> <!-- Icône de plus -->
     Add
   </a>
 </div>
 
-{% if moughataa_list %}
+{% if cartproduct_list %}
 <table class="table table-striped" id="bootstrapdatatable">
   <thead>
     <tr>
-      <th scope="col">Code</th>
-      <th scope="col">name</th>
-      <th scope="col">Wilaya</th>
+      <th scope="col">product</th>
+      <th scope="col">cart</th>
+      <th scope="col">ponderation</th>
       <th scope="col">Actions</th>
     </tr>
   </thead>
   <tbody class="table-group-divider">
-    {% for w in moughataa_list %}
+    {% for w in cartproduct_list %}
     <tr>
-      <td>{{ w.code }}</td>
-      <td>{{ w.label }}</td>
-      <td>{{ w.wilaya }}</td>
+      <td>{{ w.product }}</td>
+      <td>{{ w.cart }}</td>
+      <td>{{ w.weight }}</td>
       <td>
-        <a href="{% url 'moughataa_detail' w.pk %}" class="btn btn-info">View</a> |
-        <a href="{% url 'moughataa_edit' w.pk %}" class="btn btn-primary">Edit</a> |
-        <a href="{% url 'moughataa_delete' w.pk %}" class="btn btn-danger">Delete</a>
+        <a href="{% url 'cartproduct_detail' w.pk %}" class="btn btn-info">View</a> |
+        <a href="{% url 'cartproduct_edit' w.pk %}" class="btn btn-primary">Edit</a> |
+        <a href="{% url 'cartproduct_delete' w.pk %}" class="btn btn-danger">Delete</a>
       </td>
     </tr>
     {% endfor %}
@@ -170,7 +166,7 @@
 </table>
 
 {% else %}
-<p>Aucun moughataa trouvé dans la base de données.</p>
+<p>Aucun produit trouvé dans la base de données.</p>
 {% endif %}
 
 <!-- Script pour configurer DataTables -->

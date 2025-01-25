@@ -1,421 +1,436 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages
 from django.db.models import Count  # Ajoutez cette ligne d'importation
-from django.shortcuts import render
 from django.views.generic import ListView, DetailView , CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy, reverse
 from .models import *
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
+import pandas as pd
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
+from datetime import datetime, timedelta
 
 
 # Create your views here.
-
+@login_required
 def home(request):
     return render(request, 'base.html')
 
 
-class productListView(ListView):
+class productListView(LoginRequiredMixin,ListView):
     model=Product
     template_name='product_list.html'
     context_object_name='product_list'
 
-class productDetailView(DetailView):
+class productDetailView(LoginRequiredMixin,DetailView):
     model=Product
     template_name='product_detail.html'
     context_object_name='product'
 
-class productCreateView(CreateView):
+class productCreateView(LoginRequiredMixin,CreateView):
     model=Product
     template_name='product_form.html'
     fields='__all__'
     success_url = reverse_lazy('product_list')
 
-class productUpdateView(UpdateView):
+class productUpdateView(LoginRequiredMixin, UpdateView):
     model=Product
     template_name='product_form.html'
     fields='__all__'
     success_url = reverse_lazy('product_list')
 
-class productDeleteView(DeleteView):
+class productDeleteView(LoginRequiredMixin,DeleteView):
     model=Product
     template_name='product_confirm_delete.html'
     success_url='/'
-class pointVenteListView(ListView):
+class pointVenteListView(LoginRequiredMixin,ListView):
     model=PointOfSale
     template_name='pointvente.html'
     context_object_name='pointVente_list'
 
-class ProductpriceListView(ListView):
+class ProductpriceListView(LoginRequiredMixin,ListView):
     model=ProductPrice
     template_name='productprice_list.html'
     context_object_name='productprice_list'
-class ProductpriceDetailView(DetailView):
+class ProductpriceDetailView(LoginRequiredMixin,DetailView):
     model=ProductPrice
     template_name='productprice_detail.html'
     context_object_name='productprice'
 
-class ProductpriceCreateView(CreateView):
+class ProductpriceCreateView(LoginRequiredMixin,CreateView):
     model=ProductPrice
     template_name='productprice_form.html'
     fields='__all__'
     success_url = reverse_lazy('product_list')
-class ProductpriceUpdateView(UpdateView):
+class ProductpriceUpdateView(LoginRequiredMixin,UpdateView):
     model=ProductPrice
     template_name='productprice_form.html'
     fields='__all__'
 
-class ProductpriceDeleteView(DeleteView):
+class ProductpriceDeleteView(LoginRequiredMixin,DeleteView):
     model=ProductPrice
     template_name='productprice_confirm_delete.html'
     success_url='/'
 
 
 
-class pointVenteDetailView(DetailView):
+class pointVenteDetailView(LoginRequiredMixin,DetailView):
     model=PointOfSale
     template_name='pointvente_detail.html'
     context_object_name='pointVente'
 
-class pointVenteCreateView(CreateView):
+class pointVenteCreateView(LoginRequiredMixin,CreateView):
     model=PointOfSale
     template_name='pointvente_form.html'
     fields='__all__'
     success_url = reverse_lazy('pointVente_list')
 
-class pointVenteUpdateView(UpdateView):
+class pointVenteUpdateView(LoginRequiredMixin,UpdateView):
     model=PointOfSale
     template_name='pointVente_form.html'
     fields='__all__'
 
-class pointVenteDeleteView(DeleteView):
+class pointVenteDeleteView(LoginRequiredMixin,DeleteView):
     model=PointOfSale
     template_name='pointVente_confirm_delete.html'
     success_url='/'
 
-class wilayaListView(ListView):
+class wilayaListView(LoginRequiredMixin,ListView):
     model = Wilaya
     template_name = 'wilaya_list.html'
     context_object_name = 'wilaya_list'
 
-class wilayaDetailView(DetailView): 
+class wilayaDetailView(LoginRequiredMixin,DetailView): 
     model=Wilaya
     template_name='wilaya_details.html'
     context_object_name='wilaya'
 
-class wilayaCreateView(CreateView):
+class wilayaCreateView(LoginRequiredMixin,CreateView):
     model=Wilaya
     template_name='wilaya_form.html'
     fields='__all__'
     success_url = reverse_lazy('pointVente_list')
 
-class wilayaUpdateView(UpdateView):
+class wilayaUpdateView(LoginRequiredMixin,UpdateView):
     model=Wilaya
     template_name='wilaya_form.html'
     fields='__all__'    
 
-class wilayaDeleteView(DeleteView):
+class wilayaDeleteView(LoginRequiredMixin,DeleteView):
     model=Wilaya
     template_name='wilaya_confirm_delete.html'
     success_url='/'
 
-class moughataaListView(ListView):
+class moughataaListView(LoginRequiredMixin,ListView):
     model=Moughataa
     template_name='moughataa_list.html'
     context_object_name='moughataa_list'
 
-class moughataaDetailView(DetailView):
+class moughataaDetailView(LoginRequiredMixin,DetailView):
     model=Moughataa
     template_name='moughataa_detail.html'
     context_object_name='moughataa'
 
-class moughataaCreateView(CreateView):
+class moughataaCreateView(LoginRequiredMixin,CreateView):
     model=Moughataa
     template_name='moughataa_form.html'
     fields='__all__'
     success_url = reverse_lazy('pointVente_list')
 
-class moughataaUpdateView(UpdateView):  
+class moughataaUpdateView(LoginRequiredMixin,UpdateView):  
     model=Moughataa
     template_name='moughataa_form.html'
     fields='__all__'
 
-class moughataaDeleteView(DeleteView):
+class moughataaDeleteView(LoginRequiredMixin,DeleteView):
     model=Moughataa
     template_name='moughataa_confirm_delete.html'
     success_url='/'
 
-class communeListView(ListView):
+class communeListView(LoginRequiredMixin,ListView):
     model=Commune
     template_name='commune_list.html'
     context_object_name='commune_list'  
 
-class communeDetailView(DetailView):
+class communeDetailView(LoginRequiredMixin,DetailView):
     model=Commune
     template_name='commune_detail.html'
     context_object_name='commune'
 
-class communeCreateView(CreateView):
+class communeCreateView(LoginRequiredMixin,CreateView):
     model=Commune
     template_name='commune_form.html'
     fields='__all__'
     success_url = reverse_lazy('commune_list')
 
-class communeUpdateView(UpdateView):
+class communeUpdateView(LoginRequiredMixin,UpdateView):
     model=Commune
     template_name='commune_form.html'
     fields='__all__'
 
-class communeDeleteView(DeleteView):
+class communeDeleteView(LoginRequiredMixin,DeleteView):
     model=Commune
     template_name='commune_confirm_delete.html'
     success_url='/'
 
-class productTypeListView(ListView):
+class productTypeListView(LoginRequiredMixin,ListView):
     model=ProductType
     template_name='producttype_list.html'
     context_object_name='productType_list'
 
-class productTypeDetailView(DetailView):
+class productTypeDetailView(LoginRequiredMixin,DetailView):
     model=ProductType
     template_name='producttype_details.html'
     context_object_name='productType'
 
-class productTypeCreateView(CreateView):
+class productTypeCreateView(LoginRequiredMixin,CreateView):
     model=ProductType
     template_name='producttype_form.html'
     fields='__all__'
     success_url = reverse_lazy('productType_list')
 
-class productTypeUpdateView(UpdateView):
+class productTypeUpdateView(LoginRequiredMixin,UpdateView):
     model=ProductType
     template_name='producttype_form.html'
     fields='__all__'
 
-class productTypeDeleteView(DeleteView):
+class productTypeDeleteView(LoginRequiredMixin,DeleteView):
     model=ProductType
     template_name='producttype_confirm_delete.html'
     success_url='/'
 
-class CartView(ListView):
+class CartView(LoginRequiredMixin,ListView):
     model=Cart
     template_name='cart_list.html'
     context_object_name='cart_list'
 
-class CartDetailView(DetailView):
+class CartDetailView(LoginRequiredMixin,DetailView):
     model=Cart
     template_name='cart_details.html'
     context_object_name='cart'
 
-class CartCreateView(CreateView):
+class CartCreateView(LoginRequiredMixin,CreateView):
     model=Cart
     template_name='cart_form.html'
     fields='__all__'
     success_url = reverse_lazy('cart_list')
 
-class CartUpdateView(UpdateView):        
+class CartUpdateView(LoginRequiredMixin,UpdateView):        
     model=Cart
     template_name='cart_form.html'
     fields='__all__'
 
-class CartDeleteView(DeleteView):    
+class CartDeleteView(LoginRequiredMixin,DeleteView):    
     model=Cart
     template_name='cart_confirm_delete.html'
     success_url='/'
 
+class CartProductsView(LoginRequiredMixin,ListView):
+    model=CartProducts
+    template_name='cartproduct_list.html'
+    context_object_name='cartproduct_list'
+
+class CartProductDetailView(LoginRequiredMixin,DetailView):
+    model=CartProducts
+    template_name='cartproduct_details.html'
+    context_object_name='cartProduct'
+
+class CartProductCreateView(LoginRequiredMixin,CreateView):
+    model=CartProducts
+    template_name='cartproduct_form.html'
+    fields='__all__'
+    success_url = reverse_lazy('cartproduct_list')
+
+class CartProductUpdateView(LoginRequiredMixin,UpdateView):        
+    model=CartProducts
+    template_name='cartproduct_form.html'
+    fields='__all__'
+
+class CartProductDeleteView(LoginRequiredMixin,DeleteView):    
+    model=CartProducts
+    template_name='cart_confirm_delete.html'
+    success_url='/'
+
+@login_required
+def import_wilaya(request, Wilaya):
+    if request.method == 'POST':
+        file = request.FILES['formFile']
+        try:
+            df = pd.read_excel(file)
+            model = globals()[Wilaya]
+            for index, row in df.iterrows():
+                model.objects.create(**row.to_dict())
+            messages.success(request, 'Data imported successfully!')
+        except Exception as e:
+            messages.error(request, f'Error importing data: {e}')
+        return redirect(f'{Wilaya.lower()}_list')
+    return render(request, 'import.html', {'oname': Wilaya, 'opath': Wilaya.lower()})
+@login_required
+def export_wilaya(request, Wilaya):
+    model = globals()[Wilaya]
+    data = model.objects.all().values()
+    df = pd.DataFrame(data)
+    response = HttpResponse(content_type='application/ms-excel')
+    response['Content-Disposition'] = f'attachment; filename={Wilaya.lower()}_export.xlsx'
+    df.to_excel(response, index=False)
+    return response
+
+@login_required
+def import_moughataa(request):
+    if request.method == 'POST':
+        file = request.FILES['formFile']
+        try:
+            df = pd.read_excel(file)
+            for index, row in df.iterrows():
+                # Récupérer le code de la wilaya depuis le fichier Excel
+                wilaya_code = row['wilaya']  # Assurez-vous que la colonne s'appelle 'wilaya' dans le fichier Excel
+                
+                # Trouver l'instance de Wilaya correspondante
+                try:
+                    wilaya_instance = Wilaya.objects.get(code=wilaya_code)
+                except Wilaya.DoesNotExist:
+                    messages.error(request, f'Wilaya avec le code {wilaya_code} n\'existe pas.')
+                    continue  # Passer à la ligne suivante si la Wilaya n'existe pas
+                
+                # Créer l'instance de Moughataa avec l'instance de Wilaya
+                Moughataa.objects.create(
+                    code=row['code'],  # Assurez-vous que la colonne s'appelle 'code' dans le fichier Excel
+                    label=row['label'],  # Assurez-vous que la colonne s'appelle 'label' dans le fichier Excel
+                    wilaya=wilaya_instance
+                )
+            messages.success(request, 'Données importées avec succès !')
+        except Exception as e:
+            messages.error(request, f'Erreur lors de l\'importation des données : {e}')
+        return redirect('moughataa_list')  # Rediriger vers la liste des Moughataa
+    return render(request, 'import.html', {'oname': 'Moughataa', 'opath': 'moughataa'})
+@login_required
+def export_moughataa(request, Moughataa):
+    model = globals()[Moughataa]
+    data = model.objects.all().values()
+    df = pd.DataFrame(data)
+    response = HttpResponse(content_type='application/ms-excel')
+    response['Content-Disposition'] = f'attachment; filename={Moughataa.lower()}_export.xlsx'
+    df.to_excel(response, index=False)
+    return response
 
 
-def import_wilaya_csv(request):
-    if "GET" == request.method:
-        return render(request, "csv_import.html", {'oname': "wilaya", 'opath': "wilayas"})
-    try:
-        object_list = []
-        csv_file = request.FILES["formFile"]
-        file_data = csv_file.read().decode("utf-8")
-        lines = file_data.split("\n")
-        for line in lines:			
-            fields = line.split(",")
-            if len(fields) < 3 or not fields[0].isdigit():
-                continue
-            ob = Wilaya()
-            ob.id = int(fields[0])
-            ob.code = fields[1].strip()
-            ob.name = fields[2].strip()
-            object_list.append(ob)
-        
-        Wilaya.objects.bulk_create(object_list, ignore_conflicts=True)
-        print(f"Successfully imported {len(object_list)} objects.")
-
-    except Exception as e:
-        print(f"Error! Unable to upload file: {e}")
-        return HttpResponseRedirect(reverse("wilaya_import"))
-
-    return HttpResponseRedirect(reverse("wilaya_list"))
-
-def import_moughata_csv(request):
-    if "GET" == request.method:
-        return render(request, "csv_import.html", {'oname': "moughata", 'opath': "moughataas"})
-    try:
-        object_list = []
-        csv_file = request.FILES["formFile"]
-        file_data = csv_file.read().decode("utf-8")
-        lines = file_data.split("\n")
-        for line in lines:
-            fields = line.split(",")
-            if len(fields) < 4 or not fields[0].isdigit():
-                continue
-            ob = Moughataa()
-            ob.id = int(fields[0])
-            ob.code = fields[1].strip()
-            ob.label = fields[2].strip()
-            
-            # Trouver la wilaya correspondante
-            try:
-                wilaya = Wilaya.objects.get(name=fields[3].strip())
-                ob.wilaya = wilaya
-            except Wilaya.DoesNotExist:
-                print(f"Wilaya not found: {fields[3].strip()}")
-                continue
-            
-            object_list.append(ob)
-        
-        # Sauvegarder les objets dans la table Moughataa
-        Moughataa.objects.bulk_create(object_list, ignore_conflicts=True)
-        print(f"Successfully imported {len(object_list)} objects.")
-
-    except Exception as e:
-        print(f"Error! Unable to upload file: {e}")
-        return HttpResponseRedirect(reverse("moughata_import"))
-
-    return HttpResponseRedirect(reverse("wilaya_list"))
+@login_required
+def import_cart(request, Cart):
+    if request.method == 'POST':
+        file = request.FILES['formFile']
+        try:
+            df = pd.read_excel(file)
+            model = globals()[Cart]
+            for index, row in df.iterrows():
+                model.objects.create(**row.to_dict())
+            messages.success(request, 'Data imported successfully!')
+        except Exception as e:
+            messages.error(request, f'Error importing data: {e}')
+        return redirect(f'{Cart.lower()}_list')
+    return render(request, 'import.html', {'oname': Cart, 'opath': Cart.lower()})
+@login_required
+def export_cart(request, Cart):
+    model = globals()[Cart]
+    data = model.objects.all().values()
+    df = pd.DataFrame(data)
+    response = HttpResponse(content_type='application/ms-excel')
+    response['Content-Disposition'] = f'attachment; filename={Cart.lower()}_export.xlsx'
+    df.to_excel(response, index=False)
+    return response
+@login_required
+def import_producttype(request, ProductType):
+    if request.method == 'POST':
+        file = request.FILES['formFile']
+        try:
+            df = pd.read_excel(file)
+            model = globals()[ProductType]
+            for index, row in df.iterrows():
+                model.objects.create(**row.to_dict())
+            messages.success(request, 'Data imported successfully!')
+        except Exception as e:
+            messages.error(request, f'Error importing data: {e}')
+        return redirect(f'{Cart.lower()}_list')
+    return render(request, 'import.html', {'oname': ProductType, 'opath': ProductType.lower()})
+@login_required
+def export_producttype(request, ProductType):
+    model = globals()[ProductType]
+    data = model.objects.all().values()
+    df = pd.DataFrame(data)
+    response = HttpResponse(content_type='application/ms-excel')
+    response['Content-Disposition'] = f'attachment; filename={ProductType.lower()}_export.xlsx'
+    df.to_excel(response, index=False)
+    return response
 
 
-def dashboard(request):
-    # Statistiques globales
-    total_products = Product.objects.count()
-    total_points_of_sales = PointOfSale.objects.count()
-    total_moughataas = Moughataa.objects.count()
-    total_communes = Commune.objects.count()
+@login_required
+def calculate_inpc(request):
+    if request.method == 'POST':
+        month = int(request.POST.get('month'))
+        year = int(request.POST.get('year'))
+        cart_id = request.POST.get('cart')
 
-    # Données pour les graphiques
-    # Répartition des types de produits
-    product_types = Product.objects.annotate(product_count=Count('name'))
-    product_type_labels = [ptype.name for ptype in product_types]
-    product_type_data = [ptype.product_type for ptype in product_types]
+        # Convertir le mois et l'année en date
+        selected_date = datetime(year, month, 1).date()
 
-    # Répartition des points de vente par type
-    pointofsales_labels = PointOfSale.objects.values_list('type', flat=True).distinct()
-    pointofsales_data = [PointOfSale.objects.filter(type=label).count() for label in pointofsales_labels]
+        # Récupérer le panier sélectionné
+        cart = get_object_or_404(Cart, id=cart_id)
 
-    # Top 5 produits par prix (et génération des couleurs aléatoires pour chaque produit)
-    top_5_products = ProductPrice.objects.order_by('-value')[:5]
-    top_5_products_data = [
-        {
-            'name': ProductPrice.product,
-            'price_data': [product.value * (1 + i * 0.05) for i in range(5)],  # Simulation de l'évolution des prix
-            'color': f'#{i:06x}'  # Couleurs générées dynamiquement (hexadécimal)
-        }
-        for i, product in enumerate(top_5_products)
-    ]
+        # Récupérer les produits du panier
+        cart_products = CartProducts.objects.filter(cart=cart)
 
+        # Calculer l'INPC pour chaque mois de l'année en cours
+        months = []
+        inpc_values = []
 
+        for m in range(1, 13):  # Boucle sur les 12 mois
+            current_date = datetime(year, m, 1).date()
+            total_cost = 0
+            reference_cost = 0
 
-    # Rendu du template avec les données
-    return render(request, 'dashboard.html', {
-        'total_products': total_products,
-        'total_points_of_sales': total_points_of_sales,
-        'total_moughataas': total_moughataas,
-        'total_communes': total_communes,
-        'product_type_labels': product_type_labels,
-        'product_type_data': product_type_data,
-        'pointofsales_labels': pointofsales_labels,
-        'pointofsales_data': pointofsales_data,
-        'price_evolution_labels': ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
-        'top_5_products': top_5_products_data,
+            for cart_product in cart_products:
+                # Récupérer le prix du produit pour le mois courant
+                product_price = ProductPrice.objects.filter(
+                    product=cart_product.product,
+                    date_from__lte=current_date,
+                    date_to__gte=current_date
+                ).first()
 
-    })
+                if product_price:
+                    total_cost += product_price.value * cart_product.weight
 
+                # Récupérer le prix du produit pour le mois de référence (mois précédent)
+                reference_date = current_date - timedelta(days=30)  # Mois précédent
+                reference_product_price = ProductPrice.objects.filter(
+                    product=cart_product.product,
+                    date_from__lte=reference_date,
+                    date_to__gte=reference_date
+                ).first()
 
-def import_csv_commune(request):
-    if "GET" == request.method:
-        return render(request, "csv_import.html", {'oname': "commune", 'opath': "communes"})
-    try:
-        object_list = []
-        csv_file = request.FILES["formFile"]
-        file_data = csv_file.read().decode("utf-8")
-        lines = file_data.split("\n")
-        for line in lines:
-            fields = line.split(",")
-            if len(fields) < 4 or not fields[0].isdigit():
-                continue
-            ob = Commune()
-            ob.id = int(fields[0])
-            ob.code = fields[1].strip()
-            ob.name = fields[2].strip()
-            try:
-                moughataa = Moughataa.objects.get(label=fields[3].strip())
-                ob.moughataa = moughataa
-            except Moughataa.DoesNotExist:
-                print(f"Moughataa not found: {fields[3].strip()}")
-                continue
-            object_list.append(ob)
-        Commune.objects.bulk_create(object_list, ignore_conflicts=True)
-        print(f"Successfully imported {len(object_list)} objects.")
-    except Exception as e:
-        print(f"Error! Unable to upload file: {e}")
-        return HttpResponseRedirect(reverse("commune_import"))
-    return HttpResponseRedirect(reverse("commune_list"))
+                if reference_product_price:
+                    reference_cost += reference_product_price.value * cart_product.weight
 
+            # Calculer l'INPC pour le mois courant
+            if reference_cost != 0:
+                inpc = (total_cost / reference_cost) * 100
+            else:
+                inpc = 0
 
-def import_producttype(request):
-    if "GET" == request.method:
-        return render(request, "csv_import.html", {'oname': "producttype", 'opath': "producttypes"})
-    try:
-        object_list = []
-        csv_file = request.FILES["formFile"]
-        file_data = csv_file.read().decode("utf-8")
-        lines = file_data.split("\n")
-        for line in lines:
-            fields = line.split(",")
-            if len(fields) < 4 or not fields[0].isdigit():
-                continue
-            ob = ProductType()
-            ob.code = fields[1].strip()
-            ob.label = fields[2].strip()
-            ob.description=fields[3].strip()
-            object_list.append(ob)
-        ProductType.objects.bulk_create(object_list, ignore_conflicts=True)
-        print(f"Successfully imported {len(object_list)} objects.")
-    except Exception as e:
-        print(f"Error! Unable to upload file: {e}")
-        return HttpResponseRedirect(reverse("producttype_import"))
-    return HttpResponseRedirect(reverse("product_list"))
+            # Ajouter les données pour le graphique
+            months.append(f"{m}/{year}")
+            inpc_values.append(inpc)
 
-def import_product(request):
-    if "GET" == request.method:
-        return render(request, "csv_import.html", {'oname': "product", 'opath': "products"})
-    try:
-        object_list = []
-        csv_file = request.FILES["formFile"]
-        file_data = csv_file.read().decode("utf-8")
-        lines = file_data.split("\n")
-        for line in lines:
-            fields = line.split(",")
-            if len(fields) < 4 or not fields[0].isdigit():
-                continue
-            ob = Product()
-            ob.code = fields[1].strip()
-            ob.name = fields[2].strip()
-            ob.description=fields[3].strip()
-            ob.unit_measure=fields[4].strip()
-            try:
-                producttype = Product.objects.get(label=fields[5].strip())
-                ob.product_type = producttype
-            except ProductType.DoesNotExist:
-                print(f"Moughataa not found: {fields[5].strip()}")
-                continue
-            object_list.append(ob)
-        Commune.objects.bulk_create(object_list, ignore_conflicts=True)
-        print(f"Successfully imported {len(object_list)} objects.")
-    except Exception as e:
-        print(f"Error! Unable to upload file: {e}")
-        return HttpResponseRedirect(reverse("import_product"))
-    return HttpResponseRedirect(reverse("product_list"))
+        # Récupérer l'INPC du mois sélectionné
+        selected_inpc = inpc_values[month - 1]
+
+        return render(request, 'inpc.html', {
+            'inpc': selected_inpc,
+            'month': month,
+            'year': year,
+            'cart': cart,
+            'months': months,  # Liste des mois pour le graphique
+            'inpc_values': inpc_values  # Liste des valeurs de l'INPC
+        })
+
+    # Récupérer tous les paniers pour la sélection
+    carts = Cart.objects.all()
+    return render(request, 'calcule_inpc.html', {'carts': carts})

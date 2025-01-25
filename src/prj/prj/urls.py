@@ -1,9 +1,11 @@
-from django.urls import path
+from django.urls import path, include
 from django.contrib import admin
 from myapp.views import *
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path("accounts/", include("django.contrib.auth.urls")),
+    path('calculate-inpc/', calculate_inpc, name='calculate_inpc'),
     path("", home, name="home"),
     path("product/list/", productListView.as_view(), name="product_list"),
     path("product/<int:pk>/", productDetailView.as_view(), name="product_detail"),
@@ -25,12 +27,12 @@ urlpatterns = [
     path("productType/new/", productTypeCreateView.as_view(), name="producttype_new"),
     path("productType/edit/<int:pk>/", productTypeUpdateView.as_view(), name="producttype_edit"),
     path("productType/delete/<int:pk>/", productTypeDeleteView.as_view(), name="producttype_delete"),
-    path("wilaya/list", wilayaListView.as_view(), name="wilaya_list"),
-    path("wilaya/<int:pk>/", wilayaDetailView.as_view(), name="wilaya_detail"),
-    path("wilaya/new/", wilayaCreateView.as_view(), name="wilaya_new"),
-    path("wilaya/edit/<int:pk>/", wilayaUpdateView.as_view(), name="wilaya_edit"),
-    path("wilaya/delete/<int:pk>/", wilayaDeleteView.as_view(), name="wilaya_delete"),
-    path("moughataa/list", moughataaListView.as_view(), name="moughataa_list"),
+    path("/wilaya/list", wilayaListView.as_view(), name="wilaya_list"),
+    path("/wilaya/<int:pk>/", wilayaDetailView.as_view(), name="wilaya_detail"),
+    path("/wilaya/new/", wilayaCreateView.as_view(), name="wilaya_new"),
+    path("/wilaya/edit/<int:pk>/", wilayaUpdateView.as_view(), name="wilaya_edit"),
+    path("/wilaya/delete/<int:pk>/", wilayaDeleteView.as_view(), name="wilaya_delete"),
+    path("/moughataa/list", moughataaListView.as_view(), name="moughataa_list"),
     path("moughataa/<int:pk>/", moughataaDetailView.as_view(), name="moughataa_detail"),
     path("moughataa/new/", moughataaCreateView.as_view(), name="moughataa_new"),
     path("moughataa/edit/<int:pk>/", moughataaUpdateView.as_view(), name="moughataa_edit"),
@@ -45,10 +47,17 @@ urlpatterns = [
     path("cart/new/", CartCreateView.as_view(), name="cart_new"),
     path("cart/edit/<int:pk>/", CartUpdateView.as_view(), name="cart_edit"),
     path("cart/delete/<int:pk>/", CartDeleteView.as_view(), name="cart_delete"),
-    path('import/wilayas', import_wilaya_csv, name='wilaya_import'),
-    path('import/moughataas', import_moughata_csv, name='moughata_import'),
-    path("dashboard/", dashboard, name="dashboard"),
-    path('import/communes/', import_csv_commune, name='commune_import'),
-    path("import/producttypes", import_producttype, name="import_producttype"),
-    path("import/products/", import_product, name="import_product")
+    path("cartproduct/list/", CartView.as_view(), name="cartproduct_list"),
+    path("cartproduct/<int:pk>/", CartDetailView.as_view(), name="cartproduct_detail"),
+    path("cartproduct/new/", CartCreateView.as_view(), name="cartproduct_new"),
+    path("cartproduct/edit/<int:pk>/", CartUpdateView.as_view(), name="cartproduct_edit"),
+    path("cartproduct/delete/<int:pk>/", CartDeleteView.as_view(), name="cartproduct_delete"),
+    path('import/<str:Wilaya>/', import_wilaya, name='import_wilaya'),
+    path('export/<str:Wilaya>/', export_wilaya, name='export_wilaya'),
+    path('import/<str:Moughataa>/', import_moughataa, name='import_moughataa'),
+    path('export/<str:Moughataa>/', export_moughataa, name='export_moughataa'),
+    path('import/<str:Cart>/', import_cart, name='import_cart'),
+    path('export/<str:Cart>/', export_cart, name='export_cart'),
+    path('import/<str:ProductType>/', import_cart, name='import_producttype'),
+    path('export/<str:ProductType>/', export_cart, name='export_producttype')
 ]

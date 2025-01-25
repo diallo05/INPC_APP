@@ -12,13 +12,13 @@
     :root {
       font-family: "Roboto", sans-serif;
       box-sizing: border-box;
-      --primary-color: #10a248; /* Vert foncé */
-      --secondary-color: #127126; /* Vert plus foncé */
-      --accent-color: #cccccc; /* Gris clair */
-      --background-color: #f4f4f4; /* Fond gris clair */
-      --footer-bg-color: #003300; /* Fond vert très foncé */
-      --text-color: #333; /* Couleur de texte principale */
-      --white: #ffffff; /* Blanc */
+      --primary-color: #10a248;
+      --secondary-color: #127126;
+      --accent-color: #cccccc;
+      --background-color: #f4f4f4;
+      --footer-bg-color: #003300;
+      --text-color: #333;
+      --white: #ffffff;
     }
 
     *,
@@ -31,50 +31,130 @@
 
     body {
       display: flex;
-      flex-direction: column;
       min-height: 100vh;
       background-color: #fffbfb;
       color: var(--text-color);
     }
 
+    /* Sidebar */
+    .sidebar {
+      width: 250px;
+      background-color: var(--background-color);
+      color: var(--text-color);
+      padding: 1rem;
+      box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .sidebar .logo img {
+      width: 100%;
+      margin-bottom: 1.5rem;
+    }
+
+    .sidebar .menu {
+      list-style: none;
+      flex-grow: 1;
+    }
+
+    .sidebar .menu li {
+      margin-bottom: 1rem;
+    }
+
+    .sidebar .menu a {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--white);
+      background-color: var(--primary-color);
+      text-decoration: none;
+      font-size: 1.1rem;
+      padding: 0.7rem;
+      border-radius: 0.5rem;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    .sidebar .menu a:hover {
+      background-color: var(--secondary-color);
+      color: var(--accent-color);
+    }
+
+    .menu-item .dropdown {
+      display: none;
+      position: relative;
+      margin-top: 0.5rem;
+    }
+
+    .menu-item:hover .dropdown {
+      display: block;
+    }
+
+    .dropdown a {
+      padding: 0.5rem;
+      display: block;
+      text-decoration: none;
+      color: var(--text-color);
+      background-color: var(--white);
+      border-radius: 0.5rem;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    .dropdown a:hover {
+      background-color: var(--accent-color);
+    }
+
+    .logout {
+      margin-top: auto;
+    }
+
+    .logout a {
+      background-color: var(--footer-bg-color);
+      color: var(--white);
+    }
+
+    .logout a:hover {
+      background-color: var(--secondary-color);
+    }
+
+    /* Main Content */
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background-color: var(--white);
+    }
+
+    .content {
+      flex: 1;
+      padding: 2rem;
+    }
+
+    .main-content h1 {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      color: #eb1b1b;
+    }
+
+    .main-content p {
+      font-size: 1.2rem;
+      margin-bottom: 2rem;
+      color: #555;
+    }
+
     /* Header */
     .header {
       display: flex;
-      justify-content: space-between;
+      justify-content: flex-start;
       align-items: center;
-      background-color: var(--primary-color);
+      background-color: #cccccc;
       color: #d1c714;
       padding: 1rem 2rem;
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
     }
 
-    .header .logo img {
-      height: 60px;
-      margin-right: 1rem;
-    }
-
-    .header .title {
-      text-align: center;
-      font-size: 1.2rem;
-      margin: 0;
-    }
-
-    .header .title span {
-      display: block;
-      font-size: 1rem;
-      font-weight: normal;
-    }
-
-    .header .title strong {
-      display: block;
-      font-size: 1.4rem;
-      font-weight: bold;
-      margin-top: 0.25rem;
-    }
-
     .header .social {
       display: flex;
-      align-items: center;
       gap: 1rem;
     }
 
@@ -89,140 +169,12 @@
       color: var(--accent-color);
     }
 
-    /* Navbar */
-    .navbar {
-      background-color: var(--secondary-color);
-      padding: 1rem 2rem;
-      display: flex;
-      justify-content: center;
-      gap: 2rem;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-    }
-
-    .navbar a {
-      color: var(--white);
-      text-decoration: none;
-      font-size: 1.1rem;
-      transition: color 0.3s;
-      position: relative;
-    }
-
-    .navbar a::after {
-      content: '';
-      position: absolute;
-      bottom: -5px;
-      left: 0;
-      width: 0;
-      height: 2px;
-      background-color: var(--accent-color);
-      transition: width 0.3s ease;
-    }
-
-    .navbar a:hover::after {
-      width: 100%;
-    }
-
-    /* Dropdown */
-    .nav-item.dropdown {
-      position: relative;
-    }
-
-    .dropdown-menu {
-      display: none;
-      position: absolute;
-      top: 100%;
-      left: 0;
-      background-color: var(--secondary-color);
-      border-radius: 4px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-      z-index: 1000;
-    }
-
-    .dropdown-menu a {
-      color: var(--white);
-      padding: 0.5rem 1rem;
-      display: block;
-      text-decoration: none;
-      transition: background-color 0.3s ease;
-    }
-
-    .dropdown-menu a:hover {
-      background-color: var(--primary-color);
-    }
-
-    .nav-item.dropdown:hover .dropdown-menu {
-      display: block;
-    }
-
-    /* Contenu principal */
-    .content {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      padding: 2rem;
-      background-color: var(--white);
-      border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-      margin: 2rem;
-    }
-
-    .content h1 {
-      font-size: 2.5rem;
-      margin-bottom: 1rem;
-      color: #eb1b1b;
-    }
-
-    .content p {
-      font-size: 1.2rem;
-      margin-bottom: 2rem;
-      color: #555;
-    }
-
-    /* Bouton de connexion */
-    .btn-login {
-      background-color: #eb1b1b;
-      color: var(--white);
-      padding: 1rem 2rem;
-      text-decoration: none;
-      border-radius: 5px;
-      font-size: 1.2rem;
-      display: inline-block;
-      transition: background-color 0.3s, transform 0.3s;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .btn-login::after {
-      content: '';
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 300%;
-      height: 300%;
-      background-color: rgba(255, 255, 255, 0.3);
-      border-radius: 50%;
-      transform: translate(-50%, -50%) scale(0);
-      transition: transform 0.5s ease;
-    }
-
-    .btn-login:hover::after {
-      transform: translate(-50%, -50%) scale(1);
-    }
-
-    .btn-login:active {
-      transform: scale(0.95);
-    }
-
     /* Footer */
     .footer {
-      background-color: #10a248;
+      background-color: #ebe7f0;
       color: var(--white);
       text-align: center;
       padding: 1rem;
-      margin-top: auto;
     }
 
     .footer p {
@@ -243,119 +195,126 @@
 
     /* Responsive Design */
     @media (max-width: 768px) {
-      .header {
+      body {
         flex-direction: column;
-        align-items: flex-start;
       }
 
-      .navbar {
-        flex-direction: column;
-        align-items: center;
+      .sidebar {
+        width: 100%;
+        height: auto;
+        padding: 1rem;
       }
 
-      .content {
-        margin: 1rem;
+      .main-content {
+        padding: 1rem;
       }
     }
   </style>
 </head>
 <body>
-  <header class="header">
-    <!-- Logo -->
+  <!-- Sidebar -->
+  <aside class="sidebar">
     <div class="logo">
       <img
         src="https://ansade.mr/wp-content/uploads/2021/08/ANSADE-Vector-Logo-Whilte-Background-PNG-3.png"
         alt="Logo de l'ansade"
       />
     </div>
+    <ul class="menu">
+      <li>
+        <a href="#">
+          <i class="fas fa-chart-bar"></i> INPC
+        </a>
+      </li>
+      <li class="menu-item">
+        <a href="#">
+          <i class="fas fa-box"></i> Products
+        </a>
+        <div class="dropdown">
+          <a href="{% url 'product_list' %}">Produit</a>
+          <a href="{% url 'cart_list' %}">Panier</a>
+          <a href="{% url 'productprice_list' %}">Prix</a>
+          <a href="{% url 'pointVente_list' %}">Point de vente</a>
+          <a href="{% url 'cartproduct_list' %}"> cart product</a>
+        </div>
+      </li>
+      <li class="menu-item">
+        <a href="#">
+          <i class="fas fa-sitemap"></i> Structure
+        </a>
+        <div class="dropdown">
+          <a href="{% url 'wilaya_list' %}">Wilaya</a>
+          <a href="{% url 'commune_list' %}">Commune</a>
+          <a href="{% url 'moughataa_list' %}">Moughataa</a>
+        </div>
+      </li>
+      <li>
+        <a href="#">
+          <i class="fas fa-map-marker-alt"></i> Localisations
+        </a>
+      </li>
+      <li>
+        <a href="#">
+          <i class="fas fa-chart-bar"></i> Dashboard
+        </a>
+      </li>
+      <li class="logout">
+        <a href="#">
+          <i class="fas fa-sign-out-alt"></i> Logout
+        </a>
+      </li>
+    </ul>
+  </aside>
 
-    <!-- Réseaux sociaux -->
-    <nav class="social" aria-label="Liens vers les réseaux sociaux">
-      <a href="https://ansade.mr/fr/" aria-label="Flux RSS"><i class="fa fa-rss"></i></a>
-      <a href="https://web.facebook.com/ansade.rim" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
-      <a href="https://ansade.mr/fr/#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
-      <a href="https://www.linkedin.com/" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
-      <a href="https://www.economie.gov.mr/ar" aria-label="Version Arabe">العربية</a>
-    </nav>
-  </header>
+  <!-- Main Content -->
+  <div class="main-content">
+    <header class="header">
+      <nav class="social" aria-label="Liens vers les réseaux sociaux">
+        <a href="https://ansade.mr/fr/" aria-label="Flux RSS"><i class="fa fa-rss"></i></a>
+        <a href="https://web.facebook.com/ansade.rim" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+        <a href="https://ansade.mr/fr/#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+        <a href="https://www.linkedin.com/" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+        <a href="https://www.economie.gov.mr/ar" aria-label="Version Arabe">العربية</a>
+      </nav>
+    </header>
 
-  <!-- Navbar -->
-  <nav class="navbar">
-    <a href="{% url 'product_list' %}">Produit</a>
-    <a href="{% url 'pointVente_list' %}">Point Vente</a>
-    <a href="{% url 'cart_list' %}">Panier</a>
-    <li class="nav-item dropdown">
-      <a class="nav-link dropdown-toggle" href="#" id="dropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-          Structure
-      </a>
-      <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-          <li><a class="dropdown-item" href="{% url 'wilaya_list' %}">Wilaya</a></li>
-          <li><a class="dropdown-item" href="{% url 'moughataa_list' %}">Moughataa</a></li>
-          <li><a class="dropdown-item" href="{% url 'commune_list' %}">Commune</a></li>
-      </ul>
-    </li>
-  </nav>
+    <div class="content">
+      {% block content %}{% endblock %}
+    </div>
 
-  {% block content %}{% endblock %}
+    <!-- Footer -->
+    <footer class="footer">
+      <p>&copy; 2023 ANSADE. Tous droits réservés.</p>
+      <p>Nombre de visiteurs : <span id="visitor-count">0</span></p>
+    </footer>
 
-  <!-- Footer -->
-  <footer class="footer">
-    <p>&copy; 2023 ANSADE. Tous droits réservés.</p>
-    <p>Nombre de visiteurs : <span id="visitor-count">0</span></p>
-  </footer>
-
-  <script>
-    // Animation pour le dropdown
-    const dropdownToggle = document.querySelector('.dropdown-toggle');
-    const dropdownMenu = document.querySelector('.dropdown-menu');
-
-    dropdownToggle.addEventListener('click', function (e) {
-      e.preventDefault();
-      dropdownMenu.style.display = dropdownMenu.style.display === 'block' ? 'none' : 'block';
-    });
-
-    // Effet de vague au clic sur le bouton
-    const btnLogin = document.querySelector('.btn-login');
-    if (btnLogin) {
-      btnLogin.addEventListener('click', function (e) {
-        e.preventDefault();
-        const ripple = document.createElement('span');
-        ripple.classList.add('ripple-effect');
-        ripple.style.left = e.offsetX + 'px';
-        ripple.style.top = e.offsetY + 'px';
-        this.appendChild(ripple);
-
+    <script>
+      // Animation pour le compteur de visiteurs
+      const visitorCount = document.getElementById('visitor-count');
+      if (visitorCount) {
+        visitorCount.style.opacity = 0;
+        visitorCount.style.transform = 'translateY(20px)';
+  
         setTimeout(() => {
-          ripple.remove();
+          visitorCount.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+          visitorCount.style.opacity = 1;
+          visitorCount.style.transform = 'translateY(0)';
         }, 500);
-      });
-    }
-
-    // Animation pour le compteur de visiteurs
-    const visitorCount = document.getElementById('visitor-count');
-    if (visitorCount) {
-      visitorCount.style.opacity = 0;
-      visitorCount.style.transform = 'translateY(20px)';
-
-      setTimeout(() => {
-        visitorCount.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-        visitorCount.style.opacity = 1;
-        visitorCount.style.transform = 'translateY(0)';
-      }, 500);
-    }
-
-    // Compteur de visiteurs
-    if (localStorage.getItem('visitorCount') === null) {
-      localStorage.setItem('visitorCount', 0);
-    }
-
-    let count = parseInt(localStorage.getItem('visitorCount'));
-    count += 1;
-    localStorage.setItem('visitorCount', count);
-
-    if (visitorCount) {
-      visitorCount.textContent = count;
-    }
-  </script>
+      }
+  
+      // Compteur de visiteurs
+      if (localStorage.getItem('visitorCount') === null) {
+        localStorage.setItem('visitorCount', 0);
+      }
+  
+      let count = parseInt(localStorage.getItem('visitorCount'));
+      count += 1;
+      localStorage.setItem('visitorCount', count);
+  
+      if (visitorCount) {
+        visitorCount.textContent = count;
+      }
+    </script>
+  </div>
 </body>
 </html>

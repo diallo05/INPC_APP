@@ -1,0 +1,50 @@
+<!-- inpc_result.html -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Résultat de l'INPC</title>
+    <!-- Inclure Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h1>Résultat de l'INPC</h1>
+    <p>INPC pour le mois de {{ month }}/{{ year }} avec le panier "{{ cart.name }}" : {{ inpc|floatformat:2 }}</p>
+
+    <!-- Graphique d'évolution de l'INPC -->
+    <h2>Évolution de l'INPC par mois</h2>
+    <canvas id="inpcChart" width="400" height="200"></canvas>
+
+    <a href="{% url 'calculate_inpc' %}">Retour</a>
+
+    <script>
+        // Données pour le graphique
+        const months = {{ months|safe }};  // Liste des mois
+        const inpcValues = {{ inpc_values|safe }};  // Liste des valeurs de l'INPC
+
+        // Créer le graphique
+        const ctx = document.getElementById('inpcChart').getContext('2d');
+        const inpcChart = new Chart(ctx, {
+            type: 'line',  // Type de graphique (ligne)
+            data: {
+                labels: months,  // Axe des X (mois)
+                datasets: [{
+                    label: 'INPC',  // Légende
+                    data: inpcValues,  // Données de l'INPC
+                    borderColor: 'rgba(75, 192, 192, 1)',  // Couleur de la ligne
+                    borderWidth: 2,
+                    fill: false  // Ne pas remplir sous la ligne
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: false  // Commencer l'axe Y à 0 ou non
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
