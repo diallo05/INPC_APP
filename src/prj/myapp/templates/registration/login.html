@@ -1,40 +1,122 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Log In</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <style>
+    body {
+      background-color: #f8f9fa;
+      font-family: 'Roboto', sans-serif;
+    }
 
-{% block title %}<title>Log In</title>{% endblock %}
+    .card {
+      border: none;
+      border-radius: 1rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
 
-{% block content %}
-<div class="container">
-  <div class="row justify-content-center">
-    <div class="col-md-6 col-lg-4">
-      <div class="card shadow-lg p-3 mb-5 bg-white rounded">
-        <div class="card-body">
-          <h1 class="h3 mb-3 fw-normal text-center">Please sign in</h1>
-          <form method="post">
-            {% csrf_token %}
-            <div class="form-floating mb-3">
-              <input type="text" class="form-control" id="id_username" name="username" placeholder="Username" required>
-              <label for="id_username"><i class="fas fa-user"></i> Username</label>
-            </div>
-            
-            <div class="form-floating mb-3">
-              <input type="password" class="form-control" id="id_password" name="password" placeholder="Password" required>
-              <label for="id_password"><i class="fas fa-lock"></i> Password</label>
-            </div>
+    .form-floating label {
+      color: #6c757d;
+      font-size: 0.9rem;
+    }
 
-            {% if form.errors %}
-              <div class="alert alert-danger" role="alert">
-                Your username and password didn't match. Please try again.
+    .form-floating input:focus {
+      border-color: #007bff;
+      box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+
+    .btn-primary {
+      background-color: #007bff;
+      border-color: #007bff;
+      transition: background-color 0.3s ease;
+    }
+
+    .btn-primary:hover {
+      background-color: #0056b3;
+      border-color: #0056b3;
+    }
+
+    .text-decoration-none:hover {
+      text-decoration: underline;
+    }
+
+    .alert {
+      animation: fadeIn 0.5s;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-md-6 col-lg-4">
+        <div class="card shadow-lg p-3 mb-5 bg-white rounded">
+          <div class="card-body">
+            <h1 class="h3 mb-3 fw-normal text-center">Please sign in</h1>
+            <form method="post">
+              <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+              <div class="form-floating mb-3">
+                <label for="id_username"><i class="fas fa-user"></i> Username</label>
+                <input type="text" class="form-control" id="id_username" name="username" placeholder="Username" required>
               </div>
-            {% endif %}
+              
+              <div class="form-floating mb-3">
+                <label for="id_password"><i class="fas fa-lock"></i> </label>
+                <input type="password" class="form-control" id="id_password" name="password" placeholder="Password" required>
+              </div>
 
-            <button class="btn btn-primary w-100 py-2" type="submit">Log In</button>
-          </form>
-          <div class="text-center mt-3">
-            <a href="#" class="text-decoration-none">Forgot password?</a>
+              {% if form.errors %}
+                <div class="alert alert-danger" role="alert">
+                  Your username and password didn't match. Please try again.
+                </div>
+              {% endif %}
+
+              <button class="btn btn-primary w-100 py-2" type="submit">Log In</button>
+            </form>
           </div>
         </div>
       </div>
     </div>
   </div>
-</div>
-{% endblock %}
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const form = document.querySelector('form');
+
+      form.addEventListener('submit', (e) => {
+        const username = document.getElementById('id_username');
+        const password = document.getElementById('id_password');
+
+        if (!username.value.trim() || !password.value.trim()) {
+          e.preventDefault();
+          alert('Both username and password are required.');
+        }
+      });
+
+      const inputs = document.querySelectorAll('.form-floating input');
+      inputs.forEach(input => {
+        input.addEventListener('focus', () => {
+          input.parentElement.classList.add('focused');
+        });
+
+        input.addEventListener('blur', () => {
+          if (!input.value.trim()) {
+            input.parentElement.classList.remove('focused');
+          }
+        });
+      });
+    });
+  </script>
+</body>
+</html>

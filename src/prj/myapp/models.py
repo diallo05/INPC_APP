@@ -61,7 +61,7 @@ class PointOfSale(models.Model):
     commune = models.ForeignKey(Commune, on_delete=models.CASCADE)
     
     def __str__(self):
-        return self.type
+        return self.commune.name 
     def save(self, *args, **kwargs):
         # Utilisation de Geopy pour obtenir la latitude et la longitude à partir de l'adresse (localisation)
         geolocator = Nominatim(user_agent="myGeocoder")

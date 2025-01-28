@@ -1,8 +1,9 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib import messages
-from django.db.models import Count  # Ajoutez cette ligne d'importation
-from django.views.generic import ListView, DetailView , CreateView, UpdateView, DeleteView
-from django.urls import reverse_lazy, reverse
+from django.shortcuts import render, redirect, get_object_or_404 # type: ignore
+from django.db.models import Avg, Count # type: ignore
+from django.contrib import messages # type: ignore
+from django.db.models import Count  # type: ignore # Ajoutez cette ligne d'importation
+from django.views.generic import ListView, DetailView , CreateView, UpdateView, DeleteView # type: ignore
+from django.urls import reverse_lazy, reverse # type: ignore
 from .models import *
 from django.http import HttpResponseRedirect, HttpResponse
 import pandas as pd
@@ -434,3 +435,36 @@ def calculate_inpc(request):
     # Récupérer tous les paniers pour la sélection
     carts = Cart.objects.all()
     return render(request, 'calcule_inpc.html', {'carts': carts})
+
+
+@login_required
+def dashboard(request):
+    # Statistiques des produits
+    product_stats = Product.objects.annotate(num_prices=Count('productprice')).values('name', 'num_prices')
+    avg_price = ProductPrice.objects.aggregate(avg_price=Avg('value'))['avg_price']
+
+    # Statistiques des points de vente
+    point_of_sale_stats = PointOfSale.objects.values('commune__name').annotate(num_points=Count('id'))
+
+    # Données pour l'INPC
+    carts = Cart.objects.all()
+    inpc_data = []
+    for cart in carts:
+        cart_products = CartProducts.objects.filter(cart=cart)
+        total_cost = sum(cp.weight * cp.product.productprice_set.first().value for cp in cart_products if cp.product.productprice_set.exists())
+        inpc_data.append({
+            'cart_name': cart.name,
+            'total_cost': total_cost
+        })
+
+    # Données pour les graphiques
+    product_prices = ProductPrice.objects.values('product__name', 'value', 'date_from')
+
+    context = {
+        'product_stats': product_stats,
+        'avg_price': avg_price,
+        'point_of_sale_stats': point_of_sale_stats,
+        'inpc_data': inpc_data,
+        'product_prices': product_prices,
+    }
+    return render(request, 'dashboard.html', context)

@@ -79,14 +79,10 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'prix',
-        "USER": "23216",
-        "PASSWORD": "23216@ESP",
-        "HOST": "db_23216",
-        "PORT": "3306",
-        "CHARSET": "UTF8",
-        'OPTIONS': {
-            "init_command": "SET default_storage_engine=INNODB",
-        },
+        'USER': 'django_user',
+        'PASSWORD': 'django_password',
+        'HOST': 'db_23216',  # Le nom du service MySQL défini dans docker-compose.yml
+        'PORT': '3306',      # Port interne du conteneur MySQL
     }
 }
 
