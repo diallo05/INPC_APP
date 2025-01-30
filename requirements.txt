@@ -3,3 +3,5 @@ mysqlclient
 openpyxl
 geopy
 pandas
+django-crispy-forms
+crispy_bootstrap5

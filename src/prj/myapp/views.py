@@ -10,6 +10,8 @@ import pandas as pd
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from datetime import datetime, timedelta
+from .forms import ExcelImportForm
+from django.views.generic.edit import FormView
 
 
 # Create your views here.
@@ -252,115 +254,6 @@ class CartProductDeleteView(LoginRequiredMixin,DeleteView):
     template_name='cart_confirm_delete.html'
     success_url='/'
 
-@login_required
-def import_wilaya(request, Wilaya):
-    if request.method == 'POST':
-        file = request.FILES['formFile']
-        try:
-            df = pd.read_excel(file)
-            model = globals()[Wilaya]
-            for index, row in df.iterrows():
-                model.objects.create(**row.to_dict())
-            messages.success(request, 'Data imported successfully!')
-        except Exception as e:
-            messages.error(request, f'Error importing data: {e}')
-        return redirect(f'{Wilaya.lower()}_list')
-    return render(request, 'import.html', {'oname': Wilaya, 'opath': Wilaya.lower()})
-@login_required
-def export_wilaya(request, Wilaya):
-    model = globals()[Wilaya]
-    data = model.objects.all().values()
-    df = pd.DataFrame(data)
-    response = HttpResponse(content_type='application/ms-excel')
-    response['Content-Disposition'] = f'attachment; filename={Wilaya.lower()}_export.xlsx'
-    df.to_excel(response, index=False)
-    return response
-
-@login_required
-def import_moughataa(request):
-    if request.method == 'POST':
-        file = request.FILES['formFile']
-        try:
-            df = pd.read_excel(file)
-            for index, row in df.iterrows():
-                # Récupérer le code de la wilaya depuis le fichier Excel
-                wilaya_code = row['wilaya']  # Assurez-vous que la colonne s'appelle 'wilaya' dans le fichier Excel
-                
-                # Trouver l'instance de Wilaya correspondante
-                try:
-                    wilaya_instance = Wilaya.objects.get(code=wilaya_code)
-                except Wilaya.DoesNotExist:
-                    messages.error(request, f'Wilaya avec le code {wilaya_code} n\'existe pas.')
-                    continue  # Passer à la ligne suivante si la Wilaya n'existe pas
-                
-                # Créer l'instance de Moughataa avec l'instance de Wilaya
-                Moughataa.objects.create(
-                    code=row['code'],  # Assurez-vous que la colonne s'appelle 'code' dans le fichier Excel
-                    label=row['label'],  # Assurez-vous que la colonne s'appelle 'label' dans le fichier Excel
-                    wilaya=wilaya_instance
-                )
-            messages.success(request, 'Données importées avec succès !')
-        except Exception as e:
-            messages.error(request, f'Erreur lors de l\'importation des données : {e}')
-        return redirect('moughataa_list')  # Rediriger vers la liste des Moughataa
-    return render(request, 'import.html', {'oname': 'Moughataa', 'opath': 'moughataa'})
-@login_required
-def export_moughataa(request, Moughataa):
-    model = globals()[Moughataa]
-    data = model.objects.all().values()
-    df = pd.DataFrame(data)
-    response = HttpResponse(content_type='application/ms-excel')
-    response['Content-Disposition'] = f'attachment; filename={Moughataa.lower()}_export.xlsx'
-    df.to_excel(response, index=False)
-    return response
-
-
-@login_required
-def import_cart(request, Cart):
-    if request.method == 'POST':
-        file = request.FILES['formFile']
-        try:
-            df = pd.read_excel(file)
-            model = globals()[Cart]
-            for index, row in df.iterrows():
-                model.objects.create(**row.to_dict())
-            messages.success(request, 'Data imported successfully!')
-        except Exception as e:
-            messages.error(request, f'Error importing data: {e}')
-        return redirect(f'{Cart.lower()}_list')
-    return render(request, 'import.html', {'oname': Cart, 'opath': Cart.lower()})
-@login_required
-def export_cart(request, Cart):
-    model = globals()[Cart]
-    data = model.objects.all().values()
-    df = pd.DataFrame(data)
-    response = HttpResponse(content_type='application/ms-excel')
-    response['Content-Disposition'] = f'attachment; filename={Cart.lower()}_export.xlsx'
-    df.to_excel(response, index=False)
-    return response
-@login_required
-def import_producttype(request, ProductType):
-    if request.method == 'POST':
-        file = request.FILES['formFile']
-        try:
-            df = pd.read_excel(file)
-            model = globals()[ProductType]
-            for index, row in df.iterrows():
-                model.objects.create(**row.to_dict())
-            messages.success(request, 'Data imported successfully!')
-        except Exception as e:
-            messages.error(request, f'Error importing data: {e}')
-        return redirect(f'{Cart.lower()}_list')
-    return render(request, 'import.html', {'oname': ProductType, 'opath': ProductType.lower()})
-@login_required
-def export_producttype(request, ProductType):
-    model = globals()[ProductType]
-    data = model.objects.all().values()
-    df = pd.DataFrame(data)
-    response = HttpResponse(content_type='application/ms-excel')
-    response['Content-Disposition'] = f'attachment; filename={ProductType.lower()}_export.xlsx'
-    df.to_excel(response, index=False)
-    return response
 
 
 @login_required
@@ -468,3 +361,308 @@ def dashboard(request):
         'product_prices': product_prices,
     }
     return render(request, 'dashboard.html', context)
+
+
+class ExcelImportView(LoginRequiredMixin, FormView):
+    template_name = 'import.html'
+    form_class = ExcelImportForm
+    success_url = '/import/'
+
+    # Configuration des colonnes attendues pour chaque modèle
+    def get_expected_columns(self, model_type):
+        column_map = {
+            'product_type': ['code', 'label', 'description'],
+            'product': ['code', 'name', 'description', 'unit_measure', 'product_type'],
+            'wilaya': ['code', 'name'],
+            'moughataa': ['code', 'label', 'wilaya'],
+            'commune': ['code', 'name', 'moughataa'],
+            'point_of_sale': ['code', 'type', 'gps_lat', 'gps_lon', 'commune'],
+            'product_price': ['value', 'date_from', 'date_to', 'product', 'point_of_sale'],
+            'cart': ['code', 'name', 'description'],
+            'cart_product': ['cart', 'product', 'weight', 'date_from', 'date_to']
+        }
+        return column_map.get(model_type, [])
+
+    def form_valid(self, form):
+        operation = form.cleaned_data['operation']
+        model_type = form.cleaned_data['model_type']
+        uploaded_file = form.cleaned_data.get('file')
+
+        try:
+            if operation == 'import':
+                return self.handle_import(model_type, uploaded_file)
+            elif operation == 'export':
+                return self.handle_export(model_type)
+        except Exception as e:
+            messages.error(self.request, f'Erreur : {str(e)}')
+        
+        return super().form_valid(form)
+
+    # Gestion des imports
+    def handle_import(self, model_type, uploaded_file):
+        import_methods = {
+            'product_type': self.import_product_types,
+            'product': self.import_products,
+            'wilaya': self.import_wilayas,
+            'moughataa': self.import_moughataas,
+            'commune': self.import_communes,
+            'point_of_sale': self.import_points_of_sale,
+            'product_price': self.import_product_prices,
+            'cart': self.import_carts,
+            'cart_product': self.import_cart_products
+        }
+        
+        df = pd.read_excel(uploaded_file)
+        missing_cols = set(self.get_expected_columns(model_type)) - set(df.columns)
+        if missing_cols:
+            raise ValueError(f"Colonnes manquantes: {', '.join(missing_cols)}")
+        
+        result = import_methods[model_type](df)
+        if result['errors']:
+            messages.warning(self.request, f"Erreurs détectées : {len(result['errors'])}")
+        else:
+            messages.success(self.request, 'Importation réussie !')
+        
+        return redirect(self.success_url)
+
+    # Gestion des exports
+    def handle_export(self, model_type):
+        export_methods = {
+            'product_type': self.export_product_types,
+            'product': self.export_products,
+            'wilaya': self.export_wilayas,
+            'moughataa': self.export_moughataas,
+            'commune': self.export_communes,
+            'point_of_sale': self.export_points_of_sale,
+            'product_price': self.export_product_prices,
+            'cart': self.export_carts,
+            'cart_product': self.export_cart_products
+        }
+        
+        df = export_methods[model_type]()
+        buffer = io.BytesIO()
+        df.to_excel(buffer, index=False, engine='openpyxl')
+        buffer.seek(0)
+        
+        response = HttpResponse(
+            buffer.getvalue(),
+            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
+        response['Content-Disposition'] = f'attachment; filename="{model_type}_export.xlsx"'
+        return response
+
+    # Méthodes d'importation pour chaque modèle
+    def import_product_types(self, df):
+        errors = []
+        for _, row in df.iterrows():
+            try:
+                ProductType.objects.update_or_create(
+                    code=row['code'],
+                    defaults={
+                        'label': row['label'],
+                        'description': row.get('description', '')
+                    }
+                )
+            except Exception as e:
+                errors.append(f"ProductType {row['code']}: {str(e)}")
+        return {'errors': errors}
+
+    def import_products(self, df):
+        errors = []
+        for _, row in df.iterrows():
+            try:
+                product_type = ProductType.objects.get(code=row['product_type'])
+                Product.objects.update_or_create(
+                    code=row['code'],
+                    defaults={
+                        'name': row['name'],
+                        'description': row.get('description', ''),
+                        'unit_measure': row['unit_measure'],
+                        'product_type': product_type
+                    }
+                )
+            except Exception as e:
+                errors.append(f"Product {row['code']}: {str(e)}")
+        return {'errors': errors}
+
+    def import_wilayas(self, df):
+        errors = []
+        for _, row in df.iterrows():
+            try:
+                Wilaya.objects.update_or_create(
+                    code=row['code'],
+                    defaults={'name': row['name']}
+                )
+            except Exception as e:
+                errors.append(f"Wilaya {row['code']}: {str(e)}")
+        return {'errors': errors}
+
+    def import_moughataas(self, df):
+        errors = []
+        for _, row in df.iterrows():
+            try:
+                wilaya = Wilaya.objects.get(code=row['wilaya'])
+                Moughataa.objects.update_or_create(
+                    code=row['code'],
+                    defaults={
+                        'label': row['label'],
+                        'wilaya': wilaya
+                    }
+                )
+            except Exception as e:
+                errors.append(f"Moughataa {row['code']}: {str(e)}")
+        return {'errors': errors}
+
+    def import_communes(self, df):
+        errors = []
+        for _, row in df.iterrows():
+            try:
+                moughataa = Moughataa.objects.get(code=row['moughataa'])
+                Commune.objects.update_or_create(
+                    code=row['code'],
+                    defaults={
+                        'name': row['name'],
+                        'moughataa': moughataa
+                    }
+                )
+            except Exception as e:
+                errors.append(f"Commune {row['code']}: {str(e)}")
+        return {'errors': errors}
+
+    def import_points_of_sale(self, df):
+        errors = []
+        for _, row in df.iterrows():
+            try:
+                commune = Commune.objects.get(code=row['commune'])
+                PointOfSale.objects.update_or_create(
+                    code=row['code'],
+                    defaults={
+                        'type': row['type'],
+                        'gps_lat': row.get('gps_lat'),
+                        'gps_lon': row.get('gps_lon'),
+                        'commune': commune
+                    }
+                )
+            except Exception as e:
+                errors.append(f"POS {row['code']}: {str(e)}")
+        return {'errors': errors}
+
+    def import_product_prices(self, df):
+        errors = []
+        for _, row in df.iterrows():
+            try:
+                product = Product.objects.get(code=row['product'])
+                pos = PointOfSale.objects.get(code=row['point_of_sale'])
+                ProductPrice.objects.update_or_create(
+                    product=product,
+                    point_of_sale=pos,
+                    date_from=row['date_from'],
+                    defaults={
+                        'value': row['value'],
+                        'date_to': row.get('date_to')
+                    }
+                )
+            except Exception as e:
+                errors.append(f"Price {row['product']}-{row['point_of_sale']}: {str(e)}")
+        return {'errors': errors}
+
+    def import_carts(self, df):
+        errors = []
+        for _, row in df.iterrows():
+            try:
+                Cart.objects.update_or_create(
+                    code=row['code'],
+                    defaults={
+                        'name': row['name'],
+                        'description': row.get('description', '')
+                    }
+                )
+            except Exception as e:
+                errors.append(f"Cart {row['code']}: {str(e)}")
+        return {'errors': errors}
+
+    def import_cart_products(self, df):
+        errors = []
+        for _, row in df.iterrows():
+            try:
+                cart = Cart.objects.get(code=row['cart'])
+                product = Product.objects.get(code=row['product'])
+                CartProducts.objects.update_or_create(
+                    cart=cart,
+                    product=product,
+                    date_from=row['date_from'],
+                    defaults={
+                        'weight': row['weight'],
+                        'date_to': row.get('date_to')
+                    }
+                )
+            except Exception as e:
+                errors.append(f"CartProduct {row['cart']}-{row['product']}: {str(e)}")
+        return {'errors': errors}
+
+    # Méthodes d'exportation pour chaque modèle
+    def export_product_types(self):
+        return pd.DataFrame.from_records(
+            ProductType.objects.all().values('code', 'label', 'description')
+        )
+
+    def export_products(self):
+        return pd.DataFrame.from_records(
+            Product.objects.all().values(
+                'code', 'name', 'description', 
+                'unit_measure', 'product_type__code'
+            )
+        )
+
+    def export_wilayas(self):
+        return pd.DataFrame.from_records(
+            Wilaya.objects.all().values('code', 'name')
+        )
+
+    def export_moughataas(self):
+        return pd.DataFrame.from_records(
+            Moughataa.objects.select_related('wilaya').values(
+                'code', 'label', 'wilaya__code'
+            )
+        )
+
+    def export_communes(self):
+        return pd.DataFrame.from_records(
+            Commune.objects.select_related('moughataa').values(
+                'code', 'name', 'moughataa__code'
+            )
+        )
+
+    def export_points_of_sale(self):
+        return pd.DataFrame.from_records(
+            PointOfSale.objects.select_related('commune').values(
+                'code', 'type', 'gps_lat', 'gps_lon', 'commune__code'
+            )
+        )
+
+    def export_product_prices(self):
+        return pd.DataFrame.from_records(
+            ProductPrice.objects.select_related('product', 'point_of_sale').values(
+                'product__code',
+                'point_of_sale__code',
+                'value',
+                'date_from',
+                'date_to'
+            )
+        )
+
+    def export_carts(self):
+        return pd.DataFrame.from_records(
+            Cart.objects.all().values('code', 'name', 'description')
+        )
+
+    def export_cart_products(self):
+        return pd.DataFrame.from_records(
+            CartProducts.objects.select_related('cart', 'product').values(
+                'cart__code',
+                'product__code',
+                'weight',
+                'date_from',
+                'date_to'
+            )
+        )

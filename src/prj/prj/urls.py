@@ -52,13 +52,6 @@ urlpatterns = [
     path("cartproduct/new/", CartProductCreateView.as_view(), name="cartproduct_new"),
     path("cartproduct/edit/<int:pk>/", CartProductUpdateView.as_view(), name="cartproduct_edit"),
     path("cartproduct/delete/<int:pk>/", CartProductDeleteView.as_view(), name="cartproduct_delete"),
-    path('import/<str:Wilaya>/', import_wilaya, name='import_wilaya'),
-    path('export/<str:Wilaya>/', export_wilaya, name='export_wilaya'),
-    path('import/<str:Moughataa>/', import_moughataa, name='import_moughataa'),
-    path('export/<str:Moughataa>/', export_moughataa, name='export_moughataa'),
-    path('import/<str:Cart>/', import_cart, name='import_cart'),
-    path('export/<str:Cart>/', export_cart, name='export_cart'),
-    path('import/<str:ProductType>/', import_cart, name='import_producttype'),
-    path('export/<str:ProductType>/', export_cart, name='export_producttype'),
+    path('import/', ExcelImportView.as_view(), name='excel_import'),
     path('dashboard/', dashboard, name='dashboard')
 ]

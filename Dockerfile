@@ -11,4 +11,4 @@ COPY requirements.txt /app/requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Set the default command to run the Django server
-#CMD ["python", "/app/myapp/manage.py", "runserver", "0.0.0.0:8000"]
+CMD ["python", "/app/myapp/manage.py", "runserver", "0.0.0.0:8000"]
