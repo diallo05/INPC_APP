@@ -8,6 +8,7 @@
     rel="stylesheet"
     href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"
   />
+  {% block extra_css %}
   <style>
     :root {
       font-family: "Roboto", sans-serif;
@@ -80,41 +81,15 @@
       color: var(--accent-color);
     }
 
-    .menu-item .dropdown {
+    /* Style pour les dropdowns cachés */
+    .dropdown {
       display: none;
-      position: relative;
-      margin-top: 0.5rem;
+      list-style: none;
+      padding-left: 20px;
     }
 
-    .menu-item:hover .dropdown {
+    .menu-item.active .dropdown {
       display: block;
-    }
-
-    .dropdown a {
-      padding: 0.5rem;
-      display: block;
-      text-decoration: none;
-      color: var(--text-color);
-      background-color: var(--white);
-      border-radius: 0.5rem;
-      transition: background-color 0.3s, color 0.3s;
-    }
-
-    .dropdown a:hover {
-      background-color: var(--accent-color);
-    }
-
-    .logout {
-      margin-top: auto;
-    }
-
-    .logout a {
-      background-color: var(--footer-bg-color);
-      color: var(--white);
-    }
-
-    .logout a:hover {
-      background-color: var(--secondary-color);
     }
 
     /* Main Content */
@@ -130,22 +105,9 @@
       padding: 2rem;
     }
 
-    .main-content h1 {
-      font-size: 2.5rem;
-      margin-bottom: 1rem;
-      color: #eb1b1b;
-    }
-
-    .main-content p {
-      font-size: 1.2rem;
-      margin-bottom: 2rem;
-      color: #555;
-    }
-
-    /* Header */
     .header {
       display: flex;
-      justify-content: flex-end; /* Aligner à droite */
+      justify-content: flex-end; 
       align-items: center;
       background-color: #cccccc;
       color: #d1c714;
@@ -153,23 +115,6 @@
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
     }
 
-    .header .social {
-      display: flex;
-      gap: 1rem;
-    }
-
-    .header .social a {
-      color: var(--white);
-      text-decoration: none;
-      font-size: 1.5rem;
-      transition: color 0.3s;
-    }
-
-    .header .social a:hover {
-      color: var(--accent-color);
-    }
-
-    /* Footer */
     .footer {
       background-color: #ebe7f0;
       color: var(--white);
@@ -182,86 +127,92 @@
       animation: fadeInUp 1s ease;
     }
 
-    @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+    /* Flexbox pour afficher les cartes horizontalement */
+    .container {
+      padding: 20px;
     }
 
-    /* Responsive Design */
+    .row {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .col-md-3 {
+      flex: 1 1 22%;
+      margin: 10px;
+    }
+
+    .card {
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+      padding: 20px;
+    }
+
+    .card-body {
+      padding: 1rem;
+    }
+
+    .card i {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+
+    .card .display-4 {
+      font-size: 2.5rem;
+      font-weight: bold;
+    }
+
     @media (max-width: 768px) {
-      body {
+      .row {
         flex-direction: column;
       }
-
-      .sidebar {
-        width: 100%;
-        height: auto;
-        padding: 1rem;
-      }
-
-      .main-content {
-        padding: 1rem;
+      .col-md-3 {
+        flex: 1 1 100%;
       }
     }
+
+    /* Taille du graphique */
+    .full-height-chart {
+        height: 100vh; /* La hauteur est définie pour prendre toute la hauteur de la fenêtre */
+        width: 100%;   /* La largeur est à 100% de son conteneur */
+    }
   </style>
+  {% endblock %}
 </head>
 <body>
   <!-- Sidebar -->
   <aside class="sidebar">
     <div class="logo">
-      <img
-        src="https://ansade.mr/wp-content/uploads/2021/08/ANSADE-Vector-Logo-Whilte-Background-PNG-3.png"
-        alt="Logo de l'ansade"
-      />
+      <img src="https://ansade.mr/wp-content/uploads/2021/08/ANSADE-Vector-Logo-Whilte-Background-PNG-3.png" alt="Logo de l'ansade"/>
     </div>
     <ul class="menu">
       <li>
-        <a href="{% url 'calculate_inpc' %}">
-          <i class="fas fa-chart-bar"></i> INPC
-        </a>
+        <a href="{% url 'calculate_inpc' %}"><i class="fas fa-chart-bar"></i> INPC</a>
       </li>
       <li class="menu-item">
-        <a href="#">
-          <i class="fas fa-box"></i> Products
-        </a>
-        <div class="dropdown">
-          <a href="{% url 'product_list' %}">Produit</a>
-          <a href="{% url 'cart_list' %}">Panier</a>
-          <a href="{% url 'productprice_list' %}">Prix</a>
-          <a href="{% url 'pointVente_list' %}">Point de vente</a>
-          <a href="{% url 'cartproduct_list' %}"> cart product</a>
-        </div>
+        <a href="#" class="dropdown-toggle"><i class="fas fa-box"></i> Products</a>
+        <ul class="dropdown">
+          <li><a href="{% url 'product_list' %}">Produit</a></li>
+          <li><a href="{% url 'cart_list' %}">Panier</a></li>
+          <li><a href="{% url 'productprice_list' %}">Prix</a></li>
+          <li><a href="{% url 'pointVente_list' %}">Point de vente</a></li>
+          <li><a href="{% url 'cartproduct_list' %}">Cart product</a></li>
+        </ul>
       </li>
       <li class="menu-item">
-        <a href="#">
-          <i class="fas fa-sitemap"></i> Structure
-        </a>
-        <div class="dropdown">
-          <a href="{% url 'wilaya_list' %}">Wilaya</a>
-          <a href="{% url 'commune_list' %}">Commune</a>
-          <a href="{% url 'moughataa_list' %}">Moughataa</a>
-        </div>
+        <a href="#" class="dropdown-toggle"><i class="fas fa-sitemap"></i> Structure</a>
+        <ul class="dropdown">
+          <li><a href="{% url 'wilaya_list' %}">Wilaya</a></li>
+          <li><a href="{% url 'commune_list' %}">Commune</a></li>
+          <li><a href="{% url 'moughataa_list' %}">Moughataa</a></li>
+        </ul>
       </li>
       <li>
-        <a href="#">
-          <i class="fas fa-map-marker-alt"></i> Localisations
-        </a>
-      </li>
-      <li>
-        <a href="{% url 'dashboard' %}">
-          <i class="fas fa-chart-bar"></i> Dashboard
-        </a>
-      </li>
-      <li class="logout">
-        <a href="#">
-          <i class="fas fa-sign-out-alt"></i> Logout
-        </a>
+        <a href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Log Out</a>
       </li>
     </ul>
   </aside>
@@ -282,7 +233,6 @@
       {% block content %}{% endblock %}
     </div>
 
-    <!-- Footer -->
     <footer class="footer">
       <p>&copy; 2023 ANSADE. Tous droits réservés.</p>
       <p>Nombre de visiteurs : <span id="visitor-count">0</span></p>
@@ -301,19 +251,29 @@
           visitorCount.style.transform = 'translateY(0)';
         }, 500);
       }
-  
+
       // Compteur de visiteurs
       if (localStorage.getItem('visitorCount') === null) {
         localStorage.setItem('visitorCount', 0);
       }
-  
+
       let count = parseInt(localStorage.getItem('visitorCount'));
       count += 1;
       localStorage.setItem('visitorCount', count);
-  
+
       if (visitorCount) {
         visitorCount.textContent = count;
       }
+
+      // Script pour afficher le dropdown au clic
+      const dropdownToggles = document.querySelectorAll('.dropdown-toggle');
+      dropdownToggles.forEach(toggle => {
+        toggle.addEventListener('click', function(event) {
+          event.preventDefault();
+          const menuItem = this.parentElement;
+          menuItem.classList.toggle('active');
+        });
+      });
     </script>
   </div>
 </body>

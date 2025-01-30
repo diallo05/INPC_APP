@@ -11,9 +11,10 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from datetime import datetime, timedelta
 from .forms import ExcelImportForm
+from collections import Counter, defaultdict
 from django.views.generic.edit import FormView
-
-
+from django.utils import timezone
+import json
 # Create your views here.
 @login_required
 def home(request):
@@ -330,38 +331,77 @@ def calculate_inpc(request):
     return render(request, 'calcule_inpc.html', {'carts': carts})
 
 
+
 @login_required
 def dashboard(request):
-    # Statistiques des produits
-    product_stats = Product.objects.annotate(num_prices=Count('productprice')).values('name', 'num_prices')
-    avg_price = ProductPrice.objects.aggregate(avg_price=Avg('value'))['avg_price']
+    # Comptage des communes, wilayas, moughataas, produits
+    commune_count = Commune.objects.count()
+    wilaya_count = Wilaya.objects.count()
+    moughataa_count = Moughataa.objects.count()
+    product_count = Product.objects.count()
 
-    # Statistiques des points de vente
-    point_of_sale_stats = PointOfSale.objects.values('commune__name').annotate(num_points=Count('id'))
+    # Comptage des produits par type
+    product_types = Product.objects.values('product_type__label')
+    product_type_count = Counter([ptype['product_type__label'] for ptype in product_types])
 
-    # Données pour l'INPC
-    carts = Cart.objects.all()
-    inpc_data = []
-    for cart in carts:
-        cart_products = CartProducts.objects.filter(cart=cart)
-        total_cost = sum(cp.weight * cp.product.productprice_set.first().value for cp in cart_products if cp.product.productprice_set.exists())
-        inpc_data.append({
-            'cart_name': cart.name,
-            'total_cost': total_cost
+    # Données pour le graphique des types de produits
+    product_type_labels = list(product_type_count.keys())
+    product_type_values = list(product_type_count.values())
+
+    # Comptage des points de vente par commune
+    point_of_sale_data = PointOfSale.objects.values('commune__name')
+    point_of_sale_count = Counter([pos['commune__name'] for pos in point_of_sale_data])
+
+    # Données pour le graphique des points de vente
+    point_of_sale_labels = list(point_of_sale_count.keys())
+    point_of_sale_values = list(point_of_sale_count.values())
+
+    # Récupération des prix de produits par date
+    product_prices = ProductPrice.objects.all()
+
+    # Organiser les prix par produit et par date
+    price_data = defaultdict(lambda: defaultdict(list))
+    for price in product_prices:
+        price_data[price.product.id]['dates'].append(price.date_from)
+        price_data[price.product.id]['values'].append(price.value)
+
+    # Préparer les données pour le graphique Line Plot
+    line_chart_labels = []
+    line_chart_datasets = []
+
+    for product_id, data in price_data.items():
+        # Regrouper les dates dans l'ordre chronologique
+        sorted_dates = sorted(data['dates'])
+        sorted_values = [data['values'][data['dates'].index(date)] for date in sorted_dates]
+        product_name = Product.objects.get(id=product_id).name
+
+        # Ajouter les labels de date uniquement la première fois
+        if not line_chart_labels:
+            line_chart_labels = [date.strftime('%Y-%m-%d') for date in sorted_dates]
+
+        line_chart_datasets.append({
+            'label': product_name,
+            'data': sorted_values,
+            'fill': False,
+            'borderColor': 'rgba(75, 192, 192, 1)',
+            'tension': 0.1
         })
 
-    # Données pour les graphiques
-    product_prices = ProductPrice.objects.values('product__name', 'value', 'date_from')
-
+    # Passer les données à la vue
     context = {
-        'product_stats': product_stats,
-        'avg_price': avg_price,
-        'point_of_sale_stats': point_of_sale_stats,
-        'inpc_data': inpc_data,
-        'product_prices': product_prices,
+        'commune_count': commune_count,
+        'wilaya_count': wilaya_count,
+        'moughataa_count': moughataa_count,
+        'product_count': product_count,
+        'product_type_labels': product_type_labels,
+        'product_type_values': product_type_values,
+        'point_of_sale_labels': point_of_sale_labels,
+        'point_of_sale_values': point_of_sale_values,
+        'line_chart_labels': json.dumps(line_chart_labels),  # Dates formatées en JSON
+        'line_chart_datasets': json.dumps(line_chart_datasets),  # Les datasets des prix en JSON
     }
-    return render(request, 'dashboard.html', context)
 
+    return render(request, 'dashboard.html', context)
 
 class ExcelImportView(LoginRequiredMixin, FormView):
     template_name = 'import.html'
