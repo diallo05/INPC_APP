@@ -6,7 +6,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("accounts/", include("django.contrib.auth.urls")),
     path('calculate-inpc/', calculate_inpc, name='calculate_inpc'),
-    path("", home, name="home"),
+    path("", dashboard, name="home"),
     path("product/list/", productListView.as_view(), name="product_list"),
     path("product/<int:pk>/", productDetailView.as_view(), name="product_detail"),
     path("product/new/", productCreateView.as_view(), name="product_new"),
@@ -53,5 +53,6 @@ urlpatterns = [
     path("cartproduct/edit/<int:pk>/", CartProductUpdateView.as_view(), name="cartproduct_edit"),
     path("cartproduct/delete/<int:pk>/", CartProductDeleteView.as_view(), name="cartproduct_delete"),
     path('import/', ExcelImportView.as_view(), name='excel_import'),
-    path('dashboard/', dashboard, name='dashboard')
+    path('dashboard/', dashboard, name='dashboard'),
+    path('generate_report/', generate_report, name='generate_report')
 ]

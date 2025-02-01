@@ -154,6 +154,7 @@
 
     .card-body {
       padding: 1rem;
+      width: 50%%;
     }
 
     .card i {
@@ -177,7 +178,7 @@
 
     /* Taille du graphique */
     .full-height-chart {
-        height: 100vh; /* La hauteur est définie pour prendre toute la hauteur de la fenêtre */
+        height: 400px; /* Ajustez la hauteur selon vos besoins */
         width: 100%;   /* La largeur est à 100% de son conteneur */
     }
   </style>
@@ -190,6 +191,9 @@
       <img src="https://ansade.mr/wp-content/uploads/2021/08/ANSADE-Vector-Logo-Whilte-Background-PNG-3.png" alt="Logo de l'ansade"/>
     </div>
     <ul class="menu">
+      <li>
+        <a href="{% url 'excel_import' %}"><i class="fas fa-chart-bar"></i> Data Sets</a>
+      </li>
       <li>
         <a href="{% url 'calculate_inpc' %}"><i class="fas fa-chart-bar"></i> INPC</a>
       </li>

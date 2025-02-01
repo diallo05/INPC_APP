@@ -5,3 +5,5 @@ geopy
 pandas
 django-crispy-forms
 crispy_bootstrap5
+reportlab
+matplotlib

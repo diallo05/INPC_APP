@@ -5,31 +5,31 @@
 {% block content %}
 
 <div class="container">
-  <h1 class="text-center my-5 text-primary">Détails du Point de Vente</h1>
+  <h1 class="text-center my-5 text-primary">Détails du Produits</h1>
   <ul class="list-group shadow-lg rounded p-4">
     <li class="list-group-item d-flex justify-content-between align-items-center">
       <b>ID</b>
-      <span>{{ pointVente.id }}</span>
+      <span>{{ product.id }}</span>
     </li>
     <li class="list-group-item d-flex justify-content-between align-items-center">
-      <b>Description</b>
-      <span>{{ pointVente.code }}</span>
+      <b>code </b>
+      <span>{{ product.code }}</span>
     </li>
     <li class="list-group-item d-flex justify-content-between align-items-center">
-      <b>Type</b>
-      <span>{{ pointVente.type }}</span>
+      <b>Name</b>
+      <span>{{ product.name }}</span>
     </li>
     <li class="list-group-item d-flex justify-content-between align-items-center">
-      <b>Catégorie</b>
-      <span>{{ pointVente.gps_lat }}</span>
+      <b>description</b>
+      <span>{{ product.description }}</span>
     </li>
     <li class="list-group-item d-flex justify-content-between align-items-center">
-      <b>Latitude</b>
-      <span>{{ pointVente.gps_lon }}</span>
+      <b>Unite </b>
+      <span>{{ product.unit_measure }}</span>
     </li>
     <li class="list-group-item d-flex justify-content-between align-items-center">
-      <b>Commune</b>
-      <span>{{ pointVente.commune }}</span>
+      <b>Type du Produits</b>
+      <span>{{ product.product_type }}</span>
     </li>
   </ul>
 </div>

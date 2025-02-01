@@ -2,6 +2,14 @@
 
 {% block content %}
 <div class="container">
+    <!-- Bouton de génération de rapport -->
+    <div class="row mb-4">
+        <div class="col-md-12 text-center">
+            <button id="generateReport" class="btn btn-primary">Générer un Rapport</button>
+        </div>
+    </div>
+
+    <!-- Cartes de statistiques -->
     <div class="row">
         <div class="col-md-3 mb-4 d-flex">
             <div class="card flex-fill shadow-sm">
@@ -41,124 +49,147 @@
         </div>
     </div>
 
-    <!-- Graphique des types de produits -->
+    <!-- Graphiques -->
     <div class="row">
         <div class="col-md-12">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title text-center">Répartition des Produits par Type</h5>
-                    <canvas id="productTypeChart" class="full-height-chart"></canvas>
-                </div>
-            </div>
+            <h5 class="text-center">Indice des Prix à la Consommation (IPC)</h5>
+            <canvas id="ipcChart" style="height: 500px;"></canvas>
         </div>
     </div>
 
-    <!-- Graphique des points de vente par commune -->
     <div class="row">
         <div class="col-md-12">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title text-center">Répartition des Points de Vente par Commune</h5>
-                    <canvas id="pointOfSaleChart" class="full-height-chart"></canvas>
-                </div>
-            </div>
+            <h5 class="text-center">Répartition des Produits par Type</h5>
+            <canvas id="productTypeChart" style="height: 500px;"></canvas>
         </div>
     </div>
 
-    <!-- Graphique de l'évolution des prix -->
     <div class="row">
         <div class="col-md-12">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title text-center">Évolution des Prix des Produits</h5>
-                    <canvas id="priceEvolutionChart" class="full-height-chart"></canvas>
-                </div>
-            </div>
+            <h5 class="text-center">Répartition des Points de Vente par Commune</h5>
+            <canvas id="pointOfSaleChart" style="height: 500px;"></canvas>
         </div>
     </div>
 
+    <div class="row">
+        <div class="col-md-12">
+            <h5 class="text-center">Évolution des Prix des Produits</h5>
+            <canvas id="priceEvolutionChart" style="height: 500px;"></canvas>
+        </div>
+    </div>
+
+    <!-- Carte des points de vente -->
+    <div class="row">
+        <div class="col-md-12">
+            <h5 class="text-center">Carte des Points de Vente</h5>
+            <div id="map" style="height: 500px;"></div>
+        </div>
+    </div>
 </div>
 
+<!-- Inclure Chart.js et Leaflet -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<!-- Script pour générer les graphiques -->
 <script>
-// Graphique des types de produits
-var ctx = document.getElementById('productTypeChart').getContext('2d');
-var productTypeChart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-        labels: {{ product_type_labels|safe }},
-        datasets: [{
-            label: 'Nombre de Produits',
-            data: {{ product_type_values|safe }},
-            backgroundColor: 'rgba(255, 99, 132, 0.2)',
-            borderColor: 'rgba(255, 99, 132, 1)',
-            borderWidth: 1
-        }]
-    },
-    options: {
-        scales: {
-            y: {
-                beginAtZero: true
-            }
-        }
-    }
-});
-
-// Graphique des points de vente par commune
-var ctx2 = document.getElementById('pointOfSaleChart').getContext('2d');
-var pointOfSaleChart = new Chart(ctx2, {
-    type: 'pie',
-    data: {
-        labels: {{ point_of_sale_labels|safe }},
-        datasets: [{
-            label: 'Nombre de Points de Vente',
-            data: {{ point_of_sale_values|safe }},
-            backgroundColor: [
-                'rgba(255, 99, 132, 0.2)',
-                'rgba(54, 162, 235, 0.2)',
-                'rgba(255, 206, 86, 0.2)',
-                'rgba(75, 192, 192, 0.2)',
-                'rgba(153, 102, 255, 0.2)',
-                'rgba(255, 159, 64, 0.2)'
-            ],
-            borderColor: [
-                'rgba(255, 99, 132, 1)',
-                'rgba(54, 162, 235, 1)',
-                'rgba(255, 206, 86, 1)',
-                'rgba(75, 192, 192, 1)',
-                'rgba(153, 102, 255, 1)',
-                'rgba(255, 159, 64, 1)'
-            ],
-            borderWidth: 1
-        }]
-    },
-    options: {
-        responsive: true
-    }
-});
-
-// Graphique de l'évolution des prix
-var ctx3 = document.getElementById('priceEvolutionChart').getContext('2d');
-var priceEvolutionChart = new Chart(ctx3, {
-    type: 'line',
-    data: {
-        labels: {{ line_chart_labels|safe }},
-        datasets: {{ line_chart_datasets|safe }}
-    },
-    options: {
-        responsive: true,
-        interaction: {
-            mode: 'index',
-            intersect: false,
+document.addEventListener("DOMContentLoaded", function() {
+    // Graphique IPC
+    var ctxIpc = document.getElementById('ipcChart').getContext('2d');
+    var ipcChart = new Chart(ctxIpc, {
+        type: 'line',
+        data: {
+            labels: {{ ipc_labels|safe }},
+            datasets: {{ ipc_chart_dataset|safe }}
         },
-        plugins: {
-            tooltip: {
-                mode: 'nearest',
-                axis: 'x',
-                intersect: false
+        options: {
+            responsive: false,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
             }
         }
-    }
+    });
+
+    // Graphique des types de produits
+    var ctxProductType = document.getElementById('productTypeChart').getContext('2d');
+    var productTypeChart = new Chart(ctxProductType, {
+        type: 'bar',
+        data: {
+            labels: {{ product_type_labels|safe }},
+            datasets: [{
+                label: 'Nombre de Produits',
+                data: {{ product_type_values|safe }},
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: false,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    // Graphique des points de vente
+    var ctxPOS = document.getElementById('pointOfSaleChart').getContext('2d');
+    var pointOfSaleChart = new Chart(ctxPOS, {
+        type: 'pie',
+        data: {
+            labels: {{ point_of_sale_labels|safe }},
+            datasets: [{
+                label: 'Nombre de Points de Vente',
+                data: {{ point_of_sale_values|safe }},
+                backgroundColor: ['rgba(255, 99, 132, 0.2)', 'rgba(54, 162, 235, 0.2)', 'rgba(255, 206, 86, 0.2)'],
+                borderColor: ['rgba(255, 99, 132, 1)', 'rgba(54, 162, 235, 1)', 'rgba(255, 206, 86, 1)'],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: false,
+            maintainAspectRatio: false
+        }
+    });
+
+    // Graphique de l'évolution des prix
+    var ctxPriceEvolution = document.getElementById('priceEvolutionChart').getContext('2d');
+    var priceEvolutionChart = new Chart(ctxPriceEvolution, {
+        type: 'line',
+        data: {
+            labels: {{ line_chart_labels|safe }},
+            datasets: {{ line_chart_datasets|safe }}
+        },
+        options: {
+            responsive: false,
+            maintainAspectRatio: false
+        }
+    });
+
+    // Carte des points de vente
+    var map = L.map('map').setView([20, -10], 6);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    var pointOfSales = JSON.parse('{{ point_of_sales_json|escapejs }}');
+    pointOfSales.forEach(function(pos) {
+        L.marker([pos.gps_lat, pos.gps_lon])
+            .addTo(map)
+            .bindPopup('<b>' + pos.code + '</b><br>' + pos.commune__name);
+    });
+
+    // Action de génération du rapport
+    document.getElementById('generateReport').addEventListener('click', function() {
+        window.location.href = '{% url "generate_report" %}';
+    });
 });
 </script>
 

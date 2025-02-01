@@ -5,10 +5,18 @@ from django.db.models import Count  # type: ignore # Ajoutez cette ligne d'impor
 from django.views.generic import ListView, DetailView , CreateView, UpdateView, DeleteView # type: ignore
 from django.urls import reverse_lazy, reverse # type: ignore
 from .models import *
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.pdfgen import canvas
+from reportlab.lib import colors
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Image
+import matplotlib.pyplot as plt
 from django.http import HttpResponseRedirect, HttpResponse
 import pandas as pd
+import io
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import Avg
 from datetime import datetime, timedelta
 from .forms import ExcelImportForm
 from collections import Counter, defaultdict
@@ -28,7 +36,7 @@ class productListView(LoginRequiredMixin,ListView):
 
 class productDetailView(LoginRequiredMixin,DetailView):
     model=Product
-    template_name='product_detail.html'
+    template_name='product_details.html'
     context_object_name='product'
 
 class productCreateView(LoginRequiredMixin,CreateView):
@@ -334,7 +342,7 @@ def calculate_inpc(request):
 
 @login_required
 def dashboard(request):
-    # Comptage des communes, wilayas, moughataas, produits
+    # Comptage des entités principales
     commune_count = Commune.objects.count()
     wilaya_count = Wilaya.objects.count()
     moughataa_count = Moughataa.objects.count()
@@ -343,42 +351,31 @@ def dashboard(request):
     # Comptage des produits par type
     product_types = Product.objects.values('product_type__label')
     product_type_count = Counter([ptype['product_type__label'] for ptype in product_types])
-
-    # Données pour le graphique des types de produits
     product_type_labels = list(product_type_count.keys())
     product_type_values = list(product_type_count.values())
 
     # Comptage des points de vente par commune
     point_of_sale_data = PointOfSale.objects.values('commune__name')
     point_of_sale_count = Counter([pos['commune__name'] for pos in point_of_sale_data])
-
-    # Données pour le graphique des points de vente
     point_of_sale_labels = list(point_of_sale_count.keys())
     point_of_sale_values = list(point_of_sale_count.values())
 
     # Récupération des prix de produits par date
     product_prices = ProductPrice.objects.all()
-
-    # Organiser les prix par produit et par date
     price_data = defaultdict(lambda: defaultdict(list))
     for price in product_prices:
         price_data[price.product.id]['dates'].append(price.date_from)
         price_data[price.product.id]['values'].append(price.value)
 
-    # Préparer les données pour le graphique Line Plot
+    # Préparer les données pour le graphique d'évolution des prix
     line_chart_labels = []
     line_chart_datasets = []
-
     for product_id, data in price_data.items():
-        # Regrouper les dates dans l'ordre chronologique
         sorted_dates = sorted(data['dates'])
         sorted_values = [data['values'][data['dates'].index(date)] for date in sorted_dates]
         product_name = Product.objects.get(id=product_id).name
-
-        # Ajouter les labels de date uniquement la première fois
         if not line_chart_labels:
             line_chart_labels = [date.strftime('%Y-%m-%d') for date in sorted_dates]
-
         line_chart_datasets.append({
             'label': product_name,
             'data': sorted_values,
@@ -387,7 +384,35 @@ def dashboard(request):
             'tension': 0.1
         })
 
-    # Passer les données à la vue
+    # Récupérer les points de vente avec coordonnées GPS
+    point_of_sales = PointOfSale.objects.filter(gps_lat__isnull=False, gps_lon__isnull=False).values(
+        'id', 'code', 'gps_lat', 'gps_lon', 'commune__name')
+    point_of_sales_json = json.dumps(list(point_of_sales))
+
+    # Calcul de l'Indice des Prix à la Consommation (IPC)
+    ipc_data = ProductPrice.objects.values('date_from').annotate(avg_price=Avg('value')).order_by('date_from')
+    ipc_labels = [entry['date_from'].strftime('%Y-%m-%d') for entry in ipc_data]
+    ipc_values = [entry['avg_price'] for entry in ipc_data]
+
+    # Préparer les données pour le graphique IPC
+    ipc_chart_dataset = [{
+        'label': 'Indice des Prix à la Consommation',
+        'data': ipc_values,
+        'fill': False,
+        'borderColor': 'rgba(255, 99, 132, 1)',
+        'tension': 0.1
+    }]
+
+    # Générer un résumé des statistiques
+    ipc_summary = {
+        'date_debut': ipc_labels[0] if ipc_labels else 'N/A',
+        'date_fin': ipc_labels[-1] if ipc_labels else 'N/A',
+        'ipc_moyen': round(sum(ipc_values) / len(ipc_values), 2) if ipc_values else 'N/A',
+        'ipc_max': max(ipc_values) if ipc_values else 'N/A',
+        'ipc_min': min(ipc_values) if ipc_values else 'N/A',
+    }
+
+    # Passer les données au template
     context = {
         'commune_count': commune_count,
         'wilaya_count': wilaya_count,
@@ -397,11 +422,120 @@ def dashboard(request):
         'product_type_values': product_type_values,
         'point_of_sale_labels': point_of_sale_labels,
         'point_of_sale_values': point_of_sale_values,
-        'line_chart_labels': json.dumps(line_chart_labels),  # Dates formatées en JSON
-        'line_chart_datasets': json.dumps(line_chart_datasets),  # Les datasets des prix en JSON
+        'line_chart_labels': json.dumps(line_chart_labels),
+        'line_chart_datasets': json.dumps(line_chart_datasets),
+        'point_of_sales_json': point_of_sales_json,
+        'ipc_labels': json.dumps(ipc_labels),
+        'ipc_chart_dataset': json.dumps(ipc_chart_dataset),
+        'ipc_summary': ipc_summary,
     }
 
     return render(request, 'dashboard.html', context)
+
+def generate_report(request):
+    # Récupérer les données statistiques
+    commune_count = Commune.objects.count()
+    wilaya_count = Wilaya.objects.count()
+    moughataa_count = Moughataa.objects.count()
+    product_count = Product.objects.count()
+
+    # Récupération des prix de produits par date
+    product_prices = ProductPrice.objects.all()
+    price_data = defaultdict(lambda: defaultdict(list))
+    for price in product_prices:
+        price_data[price.product.id]['dates'].append(price.date_from)
+        price_data[price.product.id]['values'].append(price.value)
+
+    # Récupérer les points de vente avec coordonnées GPS
+    point_of_sales = PointOfSale.objects.filter(gps_lat__isnull=False, gps_lon__isnull=False).values(
+        'id', 'code', 'gps_lat', 'gps_lon', 'commune__name')
+
+    # Calcul de l'Indice des Prix à la Consommation (IPC)
+    ipc_data = ProductPrice.objects.values('date_from').annotate(avg_price=Avg('value')).order_by('date_from')
+    ipc_labels = [entry['date_from'].strftime('%Y-%m-%d') for entry in ipc_data]
+    ipc_values = [entry['avg_price'] for entry in ipc_data]
+
+    # Préparer la réponse PDF
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="rapport_ipc.pdf"'
+
+    pdf = SimpleDocTemplate(response, pagesize=A4)
+    elements = []
+    styles = getSampleStyleSheet()
+
+    # Titre du rapport
+    elements.append(Paragraph("Rapport sur l'Indice des Prix à la Consommation", styles['Title']))
+    elements.append(Paragraph(f"Date : {datetime.now().strftime('%Y-%m-%d')}", styles['Normal']))
+
+    # Tableau des statistiques générales
+    data = [
+        ["Statistique", "Valeur"],
+        ["Nombre de Communes", commune_count],
+        ["Nombre de Wilayas", wilaya_count],
+        ["Nombre de Moughataas", moughataa_count],
+        ["Nombre de Produits", product_count],
+    ]
+    
+    table = Table(data, colWidths=[200, 200])
+    table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black)
+    ]))
+    
+    elements.append(table)
+
+    # Graphique d'évolution des prix des produits
+    plt.figure(figsize=(10, 6))
+    for product_id, data in price_data.items():
+        product_name = Product.objects.get(id=product_id).name
+        sorted_dates = sorted(data['dates'])
+        sorted_values = [data['values'][data['dates'].index(date)] for date in sorted_dates]
+        plt.plot(sorted_dates, sorted_values, label=product_name)
+
+    plt.title("Évolution des Prix des Produits")
+    plt.xlabel("Date")
+    plt.ylabel("Prix")
+    plt.legend()
+    plt.grid(True)
+
+    # Sauvegarder le graphique en tant qu'image
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png')
+    buf.seek(0)
+    plt.close()
+
+    # Ajouter l'image au PDF
+    elements.append(Paragraph("Évolution des Prix des Produits", styles['Heading2']))
+    elements.append(Image(buf, width=500, height=300))
+
+    # Graphique de l'IPC
+    plt.figure(figsize=(10, 6))
+    plt.plot(ipc_labels, ipc_values, marker='o', color='r', label='IPC')
+    plt.title("Indice des Prix à la Consommation (IPC)")
+    plt.xlabel("Date")
+    plt.ylabel("IPC")
+    plt.legend()
+    plt.grid(True)
+
+    # Sauvegarder le graphique en tant qu'image
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png')
+    buf.seek(0)
+    plt.close()
+
+    # Ajouter l'image au PDF
+    elements.append(Paragraph("Indice des Prix à la Consommation (IPC)", styles['Heading2']))
+    elements.append(Image(buf, width=500, height=300))
+
+    # Générer le PDF
+    pdf.build(elements)
+    
+    return response
 
 class ExcelImportView(LoginRequiredMixin, FormView):
     template_name = 'import.html'
