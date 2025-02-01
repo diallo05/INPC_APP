@@ -3,7 +3,7 @@
 {% block content %}
 <div class="container">
     <!-- Bouton de génération de rapport -->
-    <div class="row mb-4">
+    <!-- <div class="row mb-4">
         <div class="col-md-12 text-center">
             <button id="generateReport" class="btn btn-primary">Générer un Rapport</button>
         </div>
@@ -63,6 +63,31 @@
             <canvas id="productTypeChart" style="height: 500px;"></canvas>
         </div>
     </div>
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <form method="get" action="{% url 'dashboard' %}">
+                <div class="form-group">
+                    <label for="moughataa">Filtrer par Moughataa:</label>
+                    <select class="form-control" id="moughataa" name="moughataa_id">
+                        <option value="">Toutes les Moughataas</option>
+                        {% for moughataa in moughataas %}
+                            <option value="{{ moughataa.id }}" {% if moughataa.id == selected_moughataa_id %}selected{% endif %}>{{ moughataa.label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="year">Filtrer par Année:</label>
+                    <select class="form-control" id="year" name="year">
+                        <option value="">Toutes les années</option>
+                        {% for year in available_years %}
+                            <option value="{{ year.year }}" {% if year.year == selected_year %}selected{% endif %}>{{ year.year }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">Filtrer</button>
+            </form>
+        </div>
+    </div>
 
     <div class="row">
         <div class="col-md-12">
@@ -82,7 +107,7 @@
     <div class="row">
         <div class="col-md-12">
             <h5 class="text-center">Carte des Points de Vente</h5>
-            <div id="map" style="height: 100vh; width: 100%;"></div>  <!-- Carte pleine largeur et pleine hauteur -->
+            <div id="map" style="height: 100vh; width: 500%;"></div>  <!-- Carte pleine largeur et pleine hauteur -->
         </div>
     </div>
 </div>

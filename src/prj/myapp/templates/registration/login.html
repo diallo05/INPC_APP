@@ -8,14 +8,21 @@
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
   <style>
     body {
-      background-color: #f8f9fa;
+      background-image: url('/static/logo.png'); /* Chemin vers l'image */
+      background-size: 60%; /* Réduit la taille de l'image à 50% */
+      background-position: center; /* Centre l'image */
+      background-repeat: no-repeat; /* Empêche la répétition de l'image */
+      background-attachment: fixed; /* Fixe l'image pendant le défilement */
       font-family: 'Roboto', sans-serif;
+      /* Applique un flou à l'image de fond */
+      backdrop-filter: blur(2px); /* Flou de 5px */
     }
 
     .card {
       border: none;
       border-radius: 1rem;
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      background-color: rgba(255, 255, 255, 0.9); /* Fond légèrement transparent */
     }
 
     .form-floating label {
@@ -72,7 +79,7 @@
               </div>
               
               <div class="form-floating mb-3">
-                <label for="id_password"><i class="fas fa-lock"></i> </label>
+                <label for="id_password"><i class="fas fa-lock"></i>Password </label>
                 <input type="password" class="form-control" id="id_password" name="password" placeholder="Password" required>
               </div>
 

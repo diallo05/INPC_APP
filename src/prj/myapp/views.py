@@ -23,12 +23,13 @@ from .forms import ExcelImportForm
 from collections import Counter, defaultdict
 from django.views.generic.edit import FormView
 from django.utils import timezone
+from django.contrib.auth import logout
 import json
 # Create your views here.
-@login_required
-def home(request):
-    return render(request, 'base.html')
 
+def custom_logout(request):
+    logout(request)
+    return redirect('home')
 
 class productListView(LoginRequiredMixin,ListView):
     model=Product
@@ -47,9 +48,9 @@ class productCreateView(LoginRequiredMixin,CreateView):
     success_url = reverse_lazy('product_list')
 
 class productUpdateView(LoginRequiredMixin, UpdateView):
-    model=Product
-    template_name='product_form.html'
-    fields='__all__'
+    model = Product
+    template_name = 'product_form.html'
+    fields = '__all__'
     success_url = reverse_lazy('product_list')
 
 class productDeleteView(LoginRequiredMixin,DeleteView):
@@ -67,18 +68,19 @@ class ProductpriceListView(LoginRequiredMixin,ListView):
     context_object_name='productprice_list'
 class ProductpriceDetailView(LoginRequiredMixin,DetailView):
     model=ProductPrice
-    template_name='productprice_detail.html'
+    template_name='productprice_details.html'
     context_object_name='productprice'
 
 class ProductpriceCreateView(LoginRequiredMixin,CreateView):
     model=ProductPrice
     template_name='productprice_form.html'
     fields='__all__'
-    success_url = reverse_lazy('product_list')
+    success_url = reverse_lazy('producttype_list')
 class ProductpriceUpdateView(LoginRequiredMixin,UpdateView):
     model=ProductPrice
     template_name='productprice_form.html'
     fields='__all__'
+    success_url = reverse_lazy('producttype_list')
 
 class ProductpriceDeleteView(LoginRequiredMixin,DeleteView):
     model=ProductPrice
@@ -102,6 +104,7 @@ class pointVenteUpdateView(LoginRequiredMixin,UpdateView):
     model=PointOfSale
     template_name='pointVente_form.html'
     fields='__all__'
+    success_url = reverse_lazy('pointVente_list')
 
 class pointVenteDeleteView(LoginRequiredMixin,DeleteView):
     model=PointOfSale
@@ -127,7 +130,8 @@ class wilayaCreateView(LoginRequiredMixin,CreateView):
 class wilayaUpdateView(LoginRequiredMixin,UpdateView):
     model=Wilaya
     template_name='wilaya_form.html'
-    fields='__all__'    
+    fields='__all__'
+    success_url = reverse_lazy('pointVente_list')
 
 class wilayaDeleteView(LoginRequiredMixin,DeleteView):
     model=Wilaya
@@ -154,6 +158,7 @@ class moughataaUpdateView(LoginRequiredMixin,UpdateView):
     model=Moughataa
     template_name='moughataa_form.html'
     fields='__all__'
+    success_url = reverse_lazy('pointVente_list')
 
 class moughataaDeleteView(LoginRequiredMixin,DeleteView):
     model=Moughataa
@@ -180,6 +185,7 @@ class communeUpdateView(LoginRequiredMixin,UpdateView):
     model=Commune
     template_name='commune_form.html'
     fields='__all__'
+    success_url = reverse_lazy('commune_list')
 
 class communeDeleteView(LoginRequiredMixin,DeleteView):
     model=Commune
@@ -206,6 +212,7 @@ class productTypeUpdateView(LoginRequiredMixin,UpdateView):
     model=ProductType
     template_name='producttype_form.html'
     fields='__all__'
+    success_url = reverse_lazy('productType_list')
 
 class productTypeDeleteView(LoginRequiredMixin,DeleteView):
     model=ProductType
@@ -232,6 +239,7 @@ class CartUpdateView(LoginRequiredMixin,UpdateView):
     model=Cart
     template_name='cart_form.html'
     fields='__all__'
+    success_url = reverse_lazy('cart_list')
 
 class CartDeleteView(LoginRequiredMixin,DeleteView):    
     model=Cart
@@ -258,6 +266,7 @@ class CartProductUpdateView(LoginRequiredMixin,UpdateView):
     model=CartProducts
     template_name='cartproduct_form.html'
     fields='__all__'
+    success_url = reverse_lazy('cartproduct_list')
 
 class CartProductDeleteView(LoginRequiredMixin,DeleteView):    
     model=CartProducts

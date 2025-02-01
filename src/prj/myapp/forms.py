@@ -80,6 +80,10 @@ class ProductPriceForm(forms.ModelForm):
     class Meta:
         model = ProductPrice
         fields = '__all__'
+        widgets = {
+            'date_from': forms.DateInput(attrs={'type': 'date'}),
+            'date_to': forms.DateInput(attrs={'type': 'date'}),
+        }
 
 class CartForm(forms.ModelForm):
     class Meta:
@@ -92,5 +96,6 @@ class CartProductForm(forms.ModelForm):
         model = CartProducts
         fields = '__all__'
         widgets = {
-            'weight': forms.NumberInput(attrs={'step': '0.01', 'min': '0'})
+            'date_from': forms.DateInput(attrs={'type': 'date'}),
+            'date_to': forms.DateInput(attrs={'type': 'date'}),
         }

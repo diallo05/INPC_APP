@@ -2,9 +2,12 @@ from django.urls import path, include
 from django.contrib import admin
 from myapp.views import *
 
+
+
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("accounts/", include("django.contrib.auth.urls")),
+    path('logout/', custom_logout, name='logout'),
     path('calculate-inpc/', calculate_inpc, name='calculate_inpc'),
     path("", dashboard, name="home"),
     path("product/list/", productListView.as_view(), name="product_list"),

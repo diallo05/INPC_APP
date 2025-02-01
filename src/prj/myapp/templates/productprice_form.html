@@ -1,16 +1,27 @@
 {% extends "base.html" %}
 
-{% block title %}<title>Insert Product price</title>{% endblock %}
+{% block title %}<title>Insert Cart product</title>{% endblock %}
 
 {% block content %}
 <div class="form-container">
-  <h1>Ajouter prix</h1>
-  <form action="" method="post">
+  <h1>Ajouter un prix</h1>
+  <form method="post">
     {% csrf_token %}
-    {{ form.as_p }}
-    <input type="submit" class="btn-primary" value="Save" />
-  </form>
-</div>
+
+    <label>Product</label>
+    {{ form.product }}
+    <label>Point Vente</label>
+    {{ form.point_of_sale }}
+    <label>Value</label>
+    {{ form.value }}
+    <label for="id_date_from">Date de début :</label>
+    <input type="date" name="date_from" id="id_date_from" class="date-input" required>
+    
+    <label for="id_date_to">Date de fin :</label>
+    <input type="date" name="date_to" id="id_date_to" class="date-input">
+    <input type="submit" class="btn-primary" value="Save">
+</form>
+
 
 <style>
   /* Style général pour le formulaire */
@@ -127,5 +138,19 @@
       }
     });
   });
+
 </script>
+<!-- Inclure Flatpickr -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    flatpickr("input[type='date']", {
+      dateFormat: "Y-m-d",
+      allowInput: true
+    });
+  });
+</script>
+
 {% endblock %}
