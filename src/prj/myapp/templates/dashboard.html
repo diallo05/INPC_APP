@@ -82,7 +82,7 @@
     <div class="row">
         <div class="col-md-12">
             <h5 class="text-center">Carte des Points de Vente</h5>
-            <div id="map" style="height: 500px;"></div>
+            <div id="map" style="height: 100vh; width: 100%;"></div>  <!-- Carte pleine largeur et pleine hauteur -->
         </div>
     </div>
 </div>
@@ -174,21 +174,22 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 
     // Carte des points de vente
-    var map = L.map('map').setView([20, -10], 6);
+    var map = L.map('map').setView([20, -10], 6); // Vue initiale de la carte avec latitude et longitude
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© OpenStreetMap contributors'
     }).addTo(map);
 
-    var pointOfSales = JSON.parse('{{ point_of_sales_json|escapejs }}');
+    // Points de vente (données JSON envoyées par Django)
+    var pointOfSales = JSON.parse('{{ point_of_sales_json|escapejs }}'); // Données JSON des points de vente
     pointOfSales.forEach(function(pos) {
         L.marker([pos.gps_lat, pos.gps_lon])
             .addTo(map)
-            .bindPopup('<b>' + pos.code + '</b><br>' + pos.commune__name);
+            .bindPopup('<b>' + pos.code + '</b><br>' + pos.commune__name); // Affichage des informations dans le popup
     });
 
     // Action de génération du rapport
     document.getElementById('generateReport').addEventListener('click', function() {
-        window.location.href = '{% url "generate_report" %}';
+        window.location.href = '{% url "generate_report" %}'; // Redirection vers la vue de génération du rapport
     });
 });
 </script>

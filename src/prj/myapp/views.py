@@ -14,6 +14,7 @@ import matplotlib.pyplot as plt
 from django.http import HttpResponseRedirect, HttpResponse
 import pandas as pd
 import io
+import os
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Avg
@@ -463,6 +464,12 @@ def generate_report(request):
     elements = []
     styles = getSampleStyleSheet()
 
+    # Ajouter le logo dans l'en-tête
+    logo_path = os.path.join(os.path.dirname(__file__), "static", "logo.png")
+ # Chemin vers le fichier logo.png
+    logo = Image(logo_path, width=100, height=50)  # Ajustez la taille selon vos besoins
+    elements.append(logo)
+
     # Titre du rapport
     elements.append(Paragraph("Rapport sur l'Indice des Prix à la Consommation", styles['Title']))
     elements.append(Paragraph(f"Date : {datetime.now().strftime('%Y-%m-%d')}", styles['Normal']))
@@ -513,6 +520,9 @@ def generate_report(request):
     elements.append(Paragraph("Évolution des Prix des Produits", styles['Heading2']))
     elements.append(Image(buf, width=500, height=300))
 
+    # Commentaire pour le graphique d'évolution des prix
+    elements.append(Paragraph("Commentaire : Ce graphique montre l'évolution des prix des produits sur une période donnée.", styles['Normal']))
+
     # Graphique de l'IPC
     plt.figure(figsize=(10, 6))
     plt.plot(ipc_labels, ipc_values, marker='o', color='r', label='IPC')
@@ -532,10 +542,14 @@ def generate_report(request):
     elements.append(Paragraph("Indice des Prix à la Consommation (IPC)", styles['Heading2']))
     elements.append(Image(buf, width=500, height=300))
 
+    # Commentaire pour le graphique IPC
+    elements.append(Paragraph("Commentaire : Ce graphique montre l'évolution de l'Indice des Prix à la Consommation (IPC) sur une période donnée.", styles['Normal']))
+
     # Générer le PDF
     pdf.build(elements)
     
     return response
+
 
 class ExcelImportView(LoginRequiredMixin, FormView):
     template_name = 'import.html'
