@@ -4,7 +4,7 @@
 <div class="container">
     <!-- Sélecteur d'année -->
     <div class="row mb-4">
-        <div class="col-md-12 text-center">
+        <div class="col-md-8 text-center">
             <label for="yearFilter" class="form-label">Sélectionner une année :</label>
             <select id="yearFilter" class="form-select w-25 d-inline">
                 <option value="">Toutes les années</option>
@@ -13,13 +13,11 @@
                 {% endfor %}
             </select>
         </div>
-    </div>
-    <!-- Bouton de génération de rapport -->
-    <div class="row mb-4">
-        <div class="col-md-12 text-center">
+        <div class="col-md-4 text-end">
             <button id="generateReport" class="btn btn-primary">Générer un Rapport</button>
         </div>
     </div>
+    
 
     <!-- Cartes de statistiques -->
     <div class="row">

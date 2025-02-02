@@ -83,17 +83,6 @@
       color: var(--accent-color);
     }
 
-    /* Style pour les dropdowns cachés */
-    .dropdown {
-      display: none;
-      list-style: none;
-      padding-left: 20px;
-    }
-
-    .menu-item.active .dropdown {
-      display: block;
-    }
-
     /* Main Content */
     .main-content {
       flex: 1;
@@ -178,10 +167,43 @@
       }
     }
 
-    /* Taille du graphique */
-    .full-height-chart {
-        height: 400px; /* Ajustez la hauteur selon vos besoins */
-        width: 100%;   /* La largeur est à 100% de son conteneur */
+    /* Animation pour les boutons */
+    .form-select, .btn {
+      transition: all 0.3s ease-in-out;
+      border-radius: 0.5rem;
+    }
+
+    .form-select:hover, .btn:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Bouton de génération de rapport */
+    .btn-primary {
+      background-color: #10a248;
+      border: none;
+      color: white;
+      font-size: 1rem;
+      padding: 10px 20px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .btn-primary:hover {
+      background-color: #127126;
+    }
+
+    /* Pour les filtres de sélection */
+    .form-select {
+      background-color: #f4f4f4;
+      padding: 10px;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+    }
+
+    .form-select:focus {
+      outline: none;
+      border-color: var(--primary-color);
     }
   </style>
   {% endblock %}
@@ -270,16 +292,6 @@
       if (visitorCount) {
         visitorCount.textContent = count;
       }
-
-      // Script pour afficher le dropdown au clic
-      const dropdownToggles = document.querySelectorAll('.dropdown-toggle');
-      dropdownToggles.forEach(toggle => {
-        toggle.addEventListener('click', function(event) {
-          event.preventDefault();
-          const menuItem = this.parentElement;
-          menuItem.classList.toggle('active');
-        });
-      });
     </script>
   </div>
 </body>
