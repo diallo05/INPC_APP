@@ -5,23 +5,31 @@
 {% block content %}
 
 <div class="container">
-  <h1 class="text-center my-5 text-primary">Détails du Point de Vente</h1>
+  <h1 class="text-center my-5 text-primary">Détails du Product Cart</h1>
   <ul class="list-group shadow-lg rounded p-4">
     <li class="list-group-item d-flex justify-content-between align-items-center">
       <b>ID</b>
-      <span>{{ cart.id }}</span>
+      <span>{{ cartProduct.id }}</span>
     </li>
     <li class="list-group-item d-flex justify-content-between align-items-center">
-      <b>Code</b>
-      <span>{{ cart.code }}</span>
+      <b>Produit</b>
+      <span>{{ cartProduct.product }}</span>
     </li>
     <li class="list-group-item d-flex justify-content-between align-items-center">
-      <b>Name</b>
-      <span>{{ cart.name }}</span>
+      <b>Panier</b>
+      <span>{{ cartProduct.cart }}</span>
     </li>
     <li class="list-group-item d-flex justify-content-between align-items-center">
-      <b>Description</b>
-      <span>{{ cart.description }}</span>
+      <b>Poids</b>
+      <span>{{ cartProduct.weight }}</span>
+    </li>
+    <li class="list-group-item d-flex justify-content-between align-items-center">
+      <b>Date debut</b>
+      <span>{{ cartProduct.date_from }}</span>
+    </li>
+    <li class="list-group-item d-flex justify-content-between align-items-center">
+      <b>Date fin</b>
+      <span>{{ cartProduct.date_to}}</span>
     </li>
     </li>
   </ul>

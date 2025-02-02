@@ -6,8 +6,12 @@ from django.views.generic import ListView, DetailView , CreateView, UpdateView, 
 from django.urls import reverse_lazy, reverse # type: ignore
 from .models import *
 from reportlab.lib.pagesizes import A4
+from reportlab.pdfgen import canvas
+from reportlab.lib.utils import ImageReader
+from django.conf import settings
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.pdfgen import canvas
+from reportlab.platypus import PageBreak
 from reportlab.lib import colors
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Image
 import matplotlib.pyplot as plt
@@ -19,11 +23,13 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Avg
 from datetime import datetime, timedelta
+from django.conf import settings
 from .forms import ExcelImportForm
 from collections import Counter, defaultdict
 from django.views.generic.edit import FormView
 from django.utils import timezone
 from django.contrib.auth import logout
+import numpy as np 
 import json
 # Create your views here.
 
@@ -75,17 +81,17 @@ class ProductpriceCreateView(LoginRequiredMixin,CreateView):
     model=ProductPrice
     template_name='productprice_form.html'
     fields='__all__'
-    success_url = reverse_lazy('producttype_list')
+    success_url = reverse_lazy('productprice_list')
 class ProductpriceUpdateView(LoginRequiredMixin,UpdateView):
     model=ProductPrice
     template_name='productprice_form.html'
     fields='__all__'
-    success_url = reverse_lazy('producttype_list')
+    success_url = reverse_lazy('productprice_list')
 
 class ProductpriceDeleteView(LoginRequiredMixin,DeleteView):
     model=ProductPrice
     template_name='productprice_confirm_delete.html'
-    success_url='/'
+    success_url='productprice_list'
 
 
 
@@ -109,7 +115,7 @@ class pointVenteUpdateView(LoginRequiredMixin,UpdateView):
 class pointVenteDeleteView(LoginRequiredMixin,DeleteView):
     model=PointOfSale
     template_name='pointVente_confirm_delete.html'
-    success_url='/'
+    success_url='pointVente_list'
 
 class wilayaListView(LoginRequiredMixin,ListView):
     model = Wilaya
@@ -125,18 +131,18 @@ class wilayaCreateView(LoginRequiredMixin,CreateView):
     model=Wilaya
     template_name='wilaya_form.html'
     fields='__all__'
-    success_url = reverse_lazy('pointVente_list')
+    success_url = reverse_lazy('wilaya_list')
 
 class wilayaUpdateView(LoginRequiredMixin,UpdateView):
     model=Wilaya
     template_name='wilaya_form.html'
     fields='__all__'
-    success_url = reverse_lazy('pointVente_list')
+    success_url = reverse_lazy('wilaya_list')
 
 class wilayaDeleteView(LoginRequiredMixin,DeleteView):
     model=Wilaya
     template_name='wilaya_confirm_delete.html'
-    success_url='/'
+    success_url='wilaya_list'
 
 class moughataaListView(LoginRequiredMixin,ListView):
     model=Moughataa
@@ -152,18 +158,18 @@ class moughataaCreateView(LoginRequiredMixin,CreateView):
     model=Moughataa
     template_name='moughataa_form.html'
     fields='__all__'
-    success_url = reverse_lazy('pointVente_list')
+    success_url = reverse_lazy('moughataa_list')
 
 class moughataaUpdateView(LoginRequiredMixin,UpdateView):  
     model=Moughataa
     template_name='moughataa_form.html'
     fields='__all__'
-    success_url = reverse_lazy('pointVente_list')
+    success_url = reverse_lazy('moughataa_list')
 
 class moughataaDeleteView(LoginRequiredMixin,DeleteView):
     model=Moughataa
     template_name='moughataa_confirm_delete.html'
-    success_url='/'
+    success_url='moughataa_list'
 
 class communeListView(LoginRequiredMixin,ListView):
     model=Commune
@@ -190,7 +196,7 @@ class communeUpdateView(LoginRequiredMixin,UpdateView):
 class communeDeleteView(LoginRequiredMixin,DeleteView):
     model=Commune
     template_name='commune_confirm_delete.html'
-    success_url='/'
+    success_url='commune_list'
 
 class productTypeListView(LoginRequiredMixin,ListView):
     model=ProductType
@@ -217,7 +223,7 @@ class productTypeUpdateView(LoginRequiredMixin,UpdateView):
 class productTypeDeleteView(LoginRequiredMixin,DeleteView):
     model=ProductType
     template_name='producttype_confirm_delete.html'
-    success_url='/'
+    success_url='productType_list'
 
 class CartView(LoginRequiredMixin,ListView):
     model=Cart
@@ -244,7 +250,7 @@ class CartUpdateView(LoginRequiredMixin,UpdateView):
 class CartDeleteView(LoginRequiredMixin,DeleteView):    
     model=Cart
     template_name='cart_confirm_delete.html'
-    success_url='/'
+    success_url='cart_list'
 
 class CartProductsView(LoginRequiredMixin,ListView):
     model=CartProducts
@@ -271,7 +277,7 @@ class CartProductUpdateView(LoginRequiredMixin,UpdateView):
 class CartProductDeleteView(LoginRequiredMixin,DeleteView):    
     model=CartProducts
     template_name='cart_confirm_delete.html'
-    success_url='/'
+    success_url='cartproduct_list'
 
 
 
@@ -465,6 +471,10 @@ def dashboard(request):
     }
 
     return render(request, 'dashboard.html', context)
+
+ 
+
+@login_required
 def generate_report(request):
     # Récupérer les données statistiques
     commune_count = Commune.objects.count()
@@ -492,15 +502,28 @@ def generate_report(request):
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename="rapport_ipc.pdf"'
 
+    # Créer un objet PDF avec ReportLab
     pdf = SimpleDocTemplate(response, pagesize=A4)
     elements = []
     styles = getSampleStyleSheet()
 
+    # Ajouter la page de garde
+    cover_path = os.path.join(settings.BASE_DIR, "staticfiles", "page_garde.png")
+    if os.path.exists(cover_path):
+        # Ajouter l'image de la page de garde
+        cover_image = Image(cover_path, width=400, height=500)
+        elements.append(cover_image)
+        elements.append(PageBreak())
+    else:
+        elements.append(Paragraph("Page de garde non trouvée", styles['Title']))
+
     # Ajouter le logo dans l'en-tête
     logo_path = os.path.join(os.path.dirname(__file__), "static", "logo.png")
- # Chemin vers le fichier logo.png
-    logo = Image(logo_path, width=100, height=50)  # Ajustez la taille selon vos besoins
-    elements.append(logo)
+    if os.path.exists(logo_path):
+        logo = Image(logo_path, width=100, height=50)
+        elements.append(logo)
+    else:
+        elements.append(Paragraph("Logo non trouvé", styles['Normal']))
 
     # Titre du rapport
     elements.append(Paragraph("Rapport sur l'Indice des Prix à la Consommation", styles['Title']))
@@ -577,10 +600,94 @@ def generate_report(request):
     # Commentaire pour le graphique IPC
     elements.append(Paragraph("Commentaire : Ce graphique montre l'évolution de l'Indice des Prix à la Consommation (IPC) sur une période donnée.", styles['Normal']))
 
+    # Tableau 1 : Evolution de l’Indice National des Prix à la Consommation en novembre 2024
+    elements.append(Paragraph("Tableau 1 : Evolution de l’Indice National des Prix à la Consommation en novembre 2024", styles['Heading2']))
+    ipc_table_data = [
+        ["Date", "IPC"],
+        *[[label, value] for label, value in zip(ipc_labels, ipc_values)]
+    ]
+    ipc_table = Table(ipc_table_data, colWidths=[200, 200])
+    ipc_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black)
+    ]))
+    elements.append(ipc_table)
+
+    # Tableau 2 : Statistique par produits (évolution des prix)
+    elements.append(Paragraph("Tableau 2 : Statistique par produits (évolution des prix)", styles['Heading2']))
+    product_stats_data = [
+        ["Produit", "Prix Moyen", "Variation"],
+        *[[product.name, np.mean(price_data[product.id]['values']), np.std(price_data[product.id]['values'])] for product in Product.objects.all()]
+    ]
+    product_stats_table = Table(product_stats_data, colWidths=[200, 100, 100])
+    product_stats_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black)
+    ]))
+    elements.append(product_stats_table)
+
+    # Tableau 3 : Evolution de l’indice par fonctions en novembre 2024
+    elements.append(Paragraph("Tableau 3 : Evolution de l’indice par fonctions en novembre 2024", styles['Heading2']))
+    # Ici, vous pouvez ajouter des données spécifiques pour l'évolution par fonctions
+    function_stats_data = [
+        ["Fonction", "IPC"],
+        ["Alimentation", 120.5],
+        ["Logement", 110.3],
+        ["Transport", 105.7],
+        # Ajoutez d'autres fonctions et leurs IPC ici
+    ]
+    function_stats_table = Table(function_stats_data, colWidths=[200, 200])
+    function_stats_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black)
+    ]))
+    elements.append(function_stats_table)
+
+    # Graphique 3 : Evolutions mensuelles des indices en novembre 2024 selon les point of sales
+    elements.append(Paragraph("Graphique 3 : Evolutions mensuelles des indices en novembre 2024 selon les point of sales", styles['Heading2']))
+    # Ici, vous pouvez générer un graphique basé sur les données des points de vente
+    plt.figure(figsize=(10, 6))
+    for pos in point_of_sales:
+        pos_prices = ProductPrice.objects.filter(point_of_sale=pos['id']).values('date_from').annotate(avg_price=Avg('value')).order_by('date_from')
+        pos_labels = [entry['date_from'].strftime('%Y-%m-%d') for entry in pos_prices]
+        pos_values = [entry['avg_price'] for entry in pos_prices]
+        plt.plot(pos_labels, pos_values, label=pos['commune__name'])
+
+    plt.title("Évolution des Prix par Point de Vente")
+    plt.xlabel("Date")
+    plt.ylabel("Prix")
+    plt.legend()
+    plt.grid(True)
+
+    # Sauvegarder le graphique en tant qu'image
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png')
+    buf.seek(0)
+    plt.close()
+
+    # Ajouter l'image au PDF
+    elements.append(Image(buf, width=500, height=300))
+
     # Générer le PDF
     pdf.build(elements)
     
     return response
+
 
 
 class ExcelImportView(LoginRequiredMixin, FormView):
