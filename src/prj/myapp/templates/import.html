@@ -5,8 +5,8 @@
 <div class="container mt-4">
     <div class="row justify-content-center">
         <div class="col-md-8">
-            <div class="card">
-                <div class="card-header bg-primary text-white">
+            <div class="card interactive-card">
+                <div class="card-header bg-primary text-white text-center">
                     <h3 class="mb-0">Import/Export de données</h3>
                 </div>
                 <div class="card-body">
@@ -42,39 +42,44 @@
 </div>
 
 <style>
-    /* Style général de la carte */
-    .card {
+    /* Styles généraux */
+    .container {
+        max-width: 960px;
+    }
+
+    /* Carte interactive */
+    .interactive-card {
         border: none;
         border-radius: 15px;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
 
-    .card:hover {
+    .interactive-card:hover {
         transform: translateY(-5px);
         box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
     }
 
-    /* Style de l'en-tête de la carte */
+    /* En-tête de la carte */
     .card-header {
-        border-radius: 15px 15px 0 0;
         background: linear-gradient(135deg, #6a11cb, #2575fc);
         color: white;
         padding: 1.5rem;
         text-align: center;
+        border-radius: 15px 15px 0 0;
     }
 
-    /* Style du corps de la carte */
+    /* Corps de la carte */
     .card-body {
         padding: 2rem;
     }
 
-    /* Style des boutons */
+    /* Boutons */
     .btn {
         border-radius: 25px;
         padding: 0.5rem 1.5rem;
         font-weight: bold;
-        transition: all 0.3s ease;
+        transition: transform 0.3s ease, background 0.3s ease;
     }
 
     .btn-success {
@@ -97,7 +102,7 @@
         transform: scale(1.05);
     }
 
-    /* Style des messages d'alerte */
+    /* Alertes */
     .alert {
         border-radius: 10px;
         padding: 1rem;
@@ -113,7 +118,7 @@
         transform: translateY(-50%);
     }
 
-    /* Animation pour les messages d'alerte */
+    /* Animation pour l'apparition des alertes */
     @keyframes slideIn {
         from {
             opacity: 0;
@@ -129,9 +134,22 @@
         animation: slideIn 0.5s ease-out;
     }
 
-    /* Ajoutez ce style pour décaler les boutons vers le bas */
+    /* Conteneur des boutons */
     .button-container {
-        margin-top: 20px; /* Ajustez cette valeur selon vos besoins */
+        margin-top: 20px;
+    }
+
+    /* Style pour la transition du champ de fichier */
+    .file-group {
+        display: none;
+        opacity: 0;
+        transition: opacity 0.5s ease;
+    }
+
+    /* Effet de mise en évidence des champs de formulaire */
+    .form-control:focus {
+        box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
+        border-color: #007bff;
     }
 </style>
 
@@ -142,28 +160,20 @@
         
         function toggleFileField() {
             fileField.required = (operationSelect.value === 'import');
-            fileField.closest('.form-group').style.display = 
-                (operationSelect.value === 'import') ? 'block' : 'none';
-            
-            // Ajouter une animation pour l'apparition/disparition du champ de fichier
+            const fileGroup = fileField.closest('.form-group');
             if (operationSelect.value === 'import') {
-                fileField.closest('.form-group').style.opacity = '0';
-                setTimeout(() => {
-                    fileField.closest('.form-group').style.opacity = '1';
-                    fileField.closest('.form-group').style.transition = 'opacity 0.5s ease';
-                }, 10);
+                fileGroup.style.display = 'block';
+                setTimeout(() => fileGroup.style.opacity = '1', 10);
             } else {
-                fileField.closest('.form-group').style.opacity = '0';
-                setTimeout(() => {
-                    fileField.closest('.form-group').style.display = 'none';
-                }, 500);
+                fileGroup.style.opacity = '0';
+                setTimeout(() => fileGroup.style.display = 'none', 500);
             }
         }
         
         operationSelect.addEventListener('change', toggleFileField);
-        toggleFileField(); // Initial call
+        toggleFileField(); // Initial call to check the default value
 
-        // Ajouter une animation pour les boutons
+        // Animation des boutons
         const buttons = document.querySelectorAll('.btn');
         buttons.forEach(button => {
             button.addEventListener('mouseenter', () => {
@@ -174,7 +184,7 @@
             });
         });
 
-        // Ajouter une animation pour les messages d'alerte
+        // Animation des alertes
         const alerts = document.querySelectorAll('.alert');
         alerts.forEach(alert => {
             alert.style.opacity = '0';
