@@ -6,10 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" href="{% static 'ESP.png' %}" type="image/png">
   <title>ANSADE</title>
-  <link
-    rel="stylesheet"
-    href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"
-  />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" />
   {% block extra_css %}
   <style>
     :root {
@@ -145,7 +142,7 @@
 
     .card-body {
       padding: 1rem;
-      width: 50%%;
+      width: 50%;
     }
 
     .card i {
@@ -205,6 +202,13 @@
       outline: none;
       border-color: var(--primary-color);
     }
+
+    /* Masquer les sous-menus par défaut */
+    .dropdown {
+      display: none;
+      list-style: none;
+      padding-left: 15px;
+    }
   </style>
   {% endblock %}
 </head>
@@ -222,8 +226,8 @@
         <a href="{% url 'calculate_inpc' %}"><i class="fas fa-chart-bar"></i> INPC</a>
       </li>
       <li class="menu-item">
-        <a href="#" class="dropdown-toggle"><i class="fas fa-box"></i> Products</a>
-        <ul class="dropdown">
+        <a href="#" class="dropdown-toggle" id="products-toggle"><i class="fas fa-box"></i> Products</a>
+        <ul class="dropdown" id="products-dropdown">
           <li><a href="{% url 'product_list' %}">Produit</a></li>
           <li><a href="{% url 'cart_list' %}">Panier</a></li>
           <li><a href="{% url 'productprice_list' %}">Prix</a></li>
@@ -232,8 +236,8 @@
         </ul>
       </li>
       <li class="menu-item">
-        <a href="#" class="dropdown-toggle"><i class="fas fa-sitemap"></i> Structure</a>
-        <ul class="dropdown">
+        <a href="#" class="dropdown-toggle" id="structure-toggle"><i class="fas fa-sitemap"></i> Structure</a>
+        <ul class="dropdown" id="structure-dropdown">
           <li><a href="{% url 'wilaya_list' %}">Wilaya</a></li>
           <li><a href="{% url 'commune_list' %}">Commune</a></li>
           <li><a href="{% url 'moughataa_list' %}">Moughataa</a></li>
@@ -291,6 +295,26 @@
 
       if (visitorCount) {
         visitorCount.textContent = count;
+      }
+
+      // Gérer l'affichage du menu dropdown au clic
+      const productsToggle = document.getElementById('products-toggle');
+      const structureToggle = document.getElementById('structure-toggle');
+      const productsDropdown = document.getElementById('products-dropdown');
+      const structureDropdown = document.getElementById('structure-dropdown');
+
+      if (productsToggle) {
+        productsToggle.addEventListener('click', function(e) {
+          e.preventDefault();
+          productsDropdown.style.display = (productsDropdown.style.display === 'block') ? 'none' : 'block';
+        });
+      }
+
+      if (structureToggle) {
+        structureToggle.addEventListener('click', function(e) {
+          e.preventDefault();
+          structureDropdown.style.display = (structureDropdown.style.display === 'block') ? 'none' : 'block';
+        });
       }
     </script>
   </div>
