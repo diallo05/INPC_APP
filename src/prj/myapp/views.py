@@ -352,6 +352,23 @@ def calculate_inpc(request):
 
 @login_required
 def dashboard(request):
+    # Récupération des paramètres de filtrage depuis l'URL
+    selected_year = request.GET.get('year')
+    selected_moughataa = request.GET.get('moughataa')
+
+    # Obtenir toutes les années disponibles dans les données
+    available_years = ProductPrice.objects.dates('date_from', 'year').distinct()
+    available_years = [year.year for year in available_years]
+
+    # Obtenir toutes les Moughataas disponibles
+    available_moughataas = Moughataa.objects.all()
+
+    # Filtrage des prix des produits par année
+    if selected_year:
+        product_prices = ProductPrice.objects.filter(date_from__year=selected_year)
+    else:
+        product_prices = ProductPrice.objects.all()
+
     # Comptage des entités principales
     commune_count = Commune.objects.count()
     wilaya_count = Wilaya.objects.count()
@@ -364,14 +381,17 @@ def dashboard(request):
     product_type_labels = list(product_type_count.keys())
     product_type_values = list(product_type_count.values())
 
-    # Comptage des points de vente par commune
-    point_of_sale_data = PointOfSale.objects.values('commune__name')
+    # Filtrage des points de vente par Moughataa sélectionnée
+    if selected_moughataa:
+        point_of_sale_data = PointOfSale.objects.filter(commune__moughataa__id=selected_moughataa).values('commune__name')
+    else:
+        point_of_sale_data = PointOfSale.objects.values('commune__name')
+
     point_of_sale_count = Counter([pos['commune__name'] for pos in point_of_sale_data])
     point_of_sale_labels = list(point_of_sale_count.keys())
     point_of_sale_values = list(point_of_sale_count.values())
 
     # Récupération des prix de produits par date
-    product_prices = ProductPrice.objects.all()
     price_data = defaultdict(lambda: defaultdict(list))
     for price in product_prices:
         price_data[price.product.id]['dates'].append(price.date_from)
@@ -394,13 +414,8 @@ def dashboard(request):
             'tension': 0.1
         })
 
-    # Récupérer les points de vente avec coordonnées GPS
-    point_of_sales = PointOfSale.objects.filter(gps_lat__isnull=False, gps_lon__isnull=False).values(
-        'id', 'code', 'gps_lat', 'gps_lon', 'commune__name')
-    point_of_sales_json = json.dumps(list(point_of_sales))
-
-    # Calcul de l'Indice des Prix à la Consommation (IPC)
-    ipc_data = ProductPrice.objects.values('date_from').annotate(avg_price=Avg('value')).order_by('date_from')
+    # Calcul de l'IPC pour l'année sélectionnée
+    ipc_data = product_prices.values('date_from').annotate(avg_price=Avg('value')).order_by('date_from')
     ipc_labels = [entry['date_from'].strftime('%Y-%m-%d') for entry in ipc_data]
     ipc_values = [entry['avg_price'] for entry in ipc_data]
 
@@ -413,7 +428,12 @@ def dashboard(request):
         'tension': 0.1
     }]
 
-    # Générer un résumé des statistiques
+    # Récupérer les points de vente avec coordonnées GPS
+    point_of_sales = PointOfSale.objects.filter(gps_lat__isnull=False, gps_lon__isnull=False).values(
+        'id', 'code', 'gps_lat', 'gps_lon', 'commune__name')
+    point_of_sales_json = json.dumps(list(point_of_sales))
+
+    # Générer un résumé des statistiques IPC
     ipc_summary = {
         'date_debut': ipc_labels[0] if ipc_labels else 'N/A',
         'date_fin': ipc_labels[-1] if ipc_labels else 'N/A',
@@ -430,18 +450,21 @@ def dashboard(request):
         'product_count': product_count,
         'product_type_labels': product_type_labels,
         'product_type_values': product_type_values,
-        'point_of_sale_labels': point_of_sale_labels,
-        'point_of_sale_values': point_of_sale_values,
+        'point_of_sale_labels': json.dumps(point_of_sale_labels),
+        'point_of_sale_values': json.dumps(point_of_sale_values),
         'line_chart_labels': json.dumps(line_chart_labels),
         'line_chart_datasets': json.dumps(line_chart_datasets),
-        'point_of_sales_json': point_of_sales_json,
         'ipc_labels': json.dumps(ipc_labels),
         'ipc_chart_dataset': json.dumps(ipc_chart_dataset),
         'ipc_summary': ipc_summary,
+        'available_years': available_years,
+        'selected_year': selected_year,
+        'available_moughataas': available_moughataas,
+        'selected_moughataa': selected_moughataa,
+        'point_of_sales_json': point_of_sales_json,
     }
 
     return render(request, 'dashboard.html', context)
-
 def generate_report(request):
     # Récupérer les données statistiques
     commune_count = Commune.objects.count()

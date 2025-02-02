@@ -2,8 +2,20 @@
 
 {% block content %}
 <div class="container">
+    <!-- Sélecteur d'année -->
+    <div class="row mb-4">
+        <div class="col-md-12 text-center">
+            <label for="yearFilter" class="form-label">Sélectionner une année :</label>
+            <select id="yearFilter" class="form-select w-25 d-inline">
+                <option value="">Toutes les années</option>
+                {% for year in available_years %}
+                    <option value="{{ year }}" {% if year|stringformat:"s" == selected_year %}selected{% endif %}>{{ year }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
     <!-- Bouton de génération de rapport -->
-    <!-- <div class="row mb-4">
+    <div class="row mb-4">
         <div class="col-md-12 text-center">
             <button id="generateReport" class="btn btn-primary">Générer un Rapport</button>
         </div>
@@ -53,53 +65,37 @@
     <div class="row">
         <div class="col-md-12">
             <h5 class="text-center">Indice des Prix à la Consommation (IPC)</h5>
-            <canvas id="ipcChart" style="height: 500px;"></canvas>
+            <canvas id="ipcChart" style="height: 400px;"></canvas>
         </div>
     </div>
 
     <div class="row">
         <div class="col-md-12">
             <h5 class="text-center">Répartition des Produits par Type</h5>
-            <canvas id="productTypeChart" style="height: 500px;"></canvas>
-        </div>
-    </div>
-    <div class="row mb-4">
-        <div class="col-md-6">
-            <form method="get" action="{% url 'dashboard' %}">
-                <div class="form-group">
-                    <label for="moughataa">Filtrer par Moughataa:</label>
-                    <select class="form-control" id="moughataa" name="moughataa_id">
-                        <option value="">Toutes les Moughataas</option>
-                        {% for moughataa in moughataas %}
-                            <option value="{{ moughataa.id }}" {% if moughataa.id == selected_moughataa_id %}selected{% endif %}>{{ moughataa.label }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="year">Filtrer par Année:</label>
-                    <select class="form-control" id="year" name="year">
-                        <option value="">Toutes les années</option>
-                        {% for year in available_years %}
-                            <option value="{{ year.year }}" {% if year.year == selected_year %}selected{% endif %}>{{ year.year }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <button type="submit" class="btn btn-primary">Filtrer</button>
-            </form>
+            <canvas id="productTypeChart" style="height: 400px;"></canvas>
         </div>
     </div>
 
     <div class="row">
+        <div class="col-md-12 text-center">
+            <label for="moughataaFilter" class="form-label">Filtrer par Moughataa :</label>
+            <select id="moughataaFilter" class="form-select w-25 d-inline">
+                <option value="">Toutes les Moughataas</option>
+                {% for moughataa in available_moughataas %}
+                    <option value="{{ moughataa.id }}" {% if moughataa.id|stringformat:"s" == selected_moughataa %}selected{% endif %}>{{ moughataa.label }}</option>
+                {% endfor %}
+            </select>
+        </div>
         <div class="col-md-12">
             <h5 class="text-center">Répartition des Points de Vente par Commune</h5>
-            <canvas id="pointOfSaleChart" style="height: 500px;"></canvas>
+            <canvas id="pointOfSaleChart" style="height: 400px;"></canvas>
         </div>
     </div>
 
     <div class="row">
         <div class="col-md-12">
             <h5 class="text-center">Évolution des Prix des Produits</h5>
-            <canvas id="priceEvolutionChart" style="height: 500px;"></canvas>
+            <canvas id="priceEvolutionChart" style="height: 400px;"></canvas>
         </div>
     </div>
 
@@ -107,7 +103,7 @@
     <div class="row">
         <div class="col-md-12">
             <h5 class="text-center">Carte des Points de Vente</h5>
-            <div id="map" style="height: 100vh; width: 500%;"></div>  <!-- Carte pleine largeur et pleine hauteur -->
+            <div id="map" style="height: 500px;"></div>
         </div>
     </div>
 </div>
@@ -117,9 +113,21 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-<!-- Script pour générer les graphiques -->
+<!-- Script pour la mise à jour des graphiques -->
 <script>
 document.addEventListener("DOMContentLoaded", function() {
+    // Filtrer par année et recharger la page
+    document.getElementById("yearFilter").addEventListener("change", function() {
+        let selectedYear = this.value;
+        let url = new URL(window.location.href);
+        if (selectedYear) {
+            url.searchParams.set("year", selectedYear);
+        } else {
+            url.searchParams.delete("year");
+        }
+        window.location.href = url.toString();
+    });
+
     // Graphique IPC
     var ctxIpc = document.getElementById('ipcChart').getContext('2d');
     var ipcChart = new Chart(ctxIpc, {
@@ -132,9 +140,7 @@ document.addEventListener("DOMContentLoaded", function() {
             responsive: false,
             maintainAspectRatio: false,
             scales: {
-                y: {
-                    beginAtZero: true
-                }
+                y: { beginAtZero: true }
             }
         }
     });
@@ -157,14 +163,24 @@ document.addEventListener("DOMContentLoaded", function() {
             responsive: false,
             maintainAspectRatio: false,
             scales: {
-                y: {
-                    beginAtZero: true
-                }
+                y: { beginAtZero: true }
             }
         }
     });
 
-    // Graphique des points de vente
+     // Filtrer par Moughataa
+     document.getElementById("moughataaFilter").addEventListener("change", function() {
+        let selectedMoughataa = this.value;
+        let url = new URL(window.location.href);
+        if (selectedMoughataa) {
+            url.searchParams.set("moughataa", selectedMoughataa);
+        } else {
+            url.searchParams.delete("moughataa");
+        }
+        window.location.href = url.toString();
+    });
+
+    // Graphique des points de vente par commune
     var ctxPOS = document.getElementById('pointOfSaleChart').getContext('2d');
     var pointOfSaleChart = new Chart(ctxPOS, {
         type: 'pie',
@@ -199,24 +215,23 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 
     // Carte des points de vente
-    var map = L.map('map').setView([20, -10], 6); // Vue initiale de la carte avec latitude et longitude
+    var map = L.map('map').setView([20, -10], 6);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© OpenStreetMap contributors'
     }).addTo(map);
 
-    // Points de vente (données JSON envoyées par Django)
-    var pointOfSales = JSON.parse('{{ point_of_sales_json|escapejs }}'); // Données JSON des points de vente
+    var pointOfSales = JSON.parse('{{ point_of_sales_json|escapejs }}');
     pointOfSales.forEach(function(pos) {
         L.marker([pos.gps_lat, pos.gps_lon])
             .addTo(map)
-            .bindPopup('<b>' + pos.code + '</b><br>' + pos.commune__name); // Affichage des informations dans le popup
-    });
-
-    // Action de génération du rapport
-    document.getElementById('generateReport').addEventListener('click', function() {
-        window.location.href = '{% url "generate_report" %}'; // Redirection vers la vue de génération du rapport
+            .bindPopup('<b>' + pos.code + '</b><br>' + pos.commune__name);
     });
 });
+
+ // Action de génération du rapport
+ document.getElementById('generateReport').addEventListener('click', function() {
+        window.location.href = '{% url "generate_report" %}'; // Redirection vers la vue de génération du rapport
+    });
 </script>
 
 {% endblock %}

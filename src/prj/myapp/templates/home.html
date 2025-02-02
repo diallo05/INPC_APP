@@ -1,41 +1,159 @@
-{% extends "base.html" %}
-
-{% block title %}<title>School Schedule App</title>{% endblock %}
-
-{% block head %}
-{{ super() }}
-<style>
-  .card {
-    background-color: #f8f9fa;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  }
-  .card-header {
-    background-color: #007bff;
-    color: white;
-    font-size: 1.25rem;
-  }
-  .btn-primary {
-    background-color: #007bff;
-    border: none;
-  }
-  .btn-primary:hover {
-    background-color: #0056b3;
-  }
-</style>
-{% endblock %}
+{% extends 'base.html' %}
 
 {% block content %}
+<div class="container">
+    <!-- Sélecteur d'année -->
+    <div class="row mb-4">
+        <div class="col-md-12 text-center">
+            <label for="yearFilter" class="form-label">Sélectionner une année :</label>
+            <select id="yearFilter" class="form-select w-25 d-inline">
+                <option value="">Toutes les années</option>
+                {% for year in available_years %}
+                    <option value="{{ year }}" {% if year|stringformat:"s" == selected_year %}selected{% endif %}>{{ year }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
 
-<div class="card m-5">
-  <div class="card-header">
-    Featured
-  </div>
-  <div class="card-body">
-    <h5 class="card-title">Special title treatment</h5>
-    <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-    <a href="#" class="btn btn-primary">Go somewhere</a>
-  </div>
+    <!-- Cartes de statistiques -->
+    <div class="row">
+        <div class="col-md-3 mb-4 d-flex">
+            <div class="card flex-fill shadow-sm">
+                <div class="card-body text-center">
+                    <i class="fas fa-city fa-3x text-primary mb-3"></i>
+                    <h5 class="card-title">Communes</h5>
+                    <p class="card-text display-4">{{ commune_count }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4 d-flex">
+            <div class="card flex-fill shadow-sm">
+                <div class="card-body text-center">
+                    <i class="fas fa-map-marked-alt fa-3x text-success mb-3"></i>
+                    <h5 class="card-title">Wilayas</h5>
+                    <p class="card-text display-4">{{ wilaya_count }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4 d-flex">
+            <div class="card flex-fill shadow-sm">
+                <div class="card-body text-center">
+                    <i class="fas fa-map-pin fa-3x text-warning mb-3"></i>
+                    <h5 class="card-title">Moughataas</h5>
+                    <p class="card-text display-4">{{ moughataa_count }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4 d-flex">
+            <div class="card flex-fill shadow-sm">
+                <div class="card-body text-center">
+                    <i class="fas fa-shopping-basket fa-3x text-danger mb-3"></i>
+                    <h5 class="card-title">Produits</h5>
+                    <p class="card-text display-4">{{ product_count }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Graphiques -->
+    <div class="row">
+        <div class="col-md-12">
+            <h5 class="text-center">Indice des Prix à la Consommation (IPC)</h5>
+            <canvas id="ipcChart" style="height: 400px;"></canvas>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <h5 class="text-center">Répartition des Produits par Type</h5>
+            <canvas id="productTypeChart" style="height: 400px;"></canvas>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12 text-center">
+            <label for="moughataaFilter" class="form-label">Filtrer par Moughataa :</label>
+            <select id="moughataaFilter" class="form-select w-25 d-inline">
+                <option value="">Toutes les Moughataas</option>
+                {% for moughataa in available_moughataas %}
+                    <option value="{{ moughataa.id }}" {% if moughataa.id|stringformat:"s" == selected_moughataa %}selected{% endif %}>{{ moughataa.label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-12">
+            <h5 class="text-center">Répartition des Points de Vente par Commune</h5>
+            <canvas id="pointOfSaleChart" style="height: 400px;"></canvas>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <h5 class="text-center">Évolution des Prix des Produits</h5>
+            <canvas id="priceEvolutionChart" style="height: 400px;"></canvas>
+        </div>
+    </div>
+
+    <!-- Carte des points de vente -->
+    <div class="row">
+        <div class="col-md-12">
+            <h5 class="text-center">Carte des Points de Vente</h5>
+            <div id="map" style="height: 500px;"></div>
+        </div>
+    </div>
 </div>
+
+<!-- Inclure Chart.js et Leaflet -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<!-- Script pour la mise à jour des graphiques -->
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    // Filtrer par année
+    document.getElementById("yearFilter").addEventListener("change", function() {
+        let selectedYear = this.value;
+        let url = new URL(window.location.href);
+        if (selectedYear) {
+            url.searchParams.set("year", selectedYear);
+        } else {
+            url.searchParams.delete("year");
+        }
+        window.location.href = url.toString();
+    });
+
+    // Filtrer par Moughataa
+    document.getElementById("moughataaFilter").addEventListener("change", function() {
+        let selectedMoughataa = this.value;
+        let url = new URL(window.location.href);
+        if (selectedMoughataa) {
+            url.searchParams.set("moughataa", selectedMoughataa);
+        } else {
+            url.searchParams.delete("moughataa");
+        }
+        window.location.href = url.toString();
+    });
+
+    // Graphique des points de vente par commune
+    var ctxPOS = document.getElementById('pointOfSaleChart').getContext('2d');
+    var pointOfSaleChart = new Chart(ctxPOS, {
+        type: 'pie',
+        data: {
+            labels: {{ point_of_sale_labels|safe }},
+            datasets: [{
+                label: 'Nombre de Points de Vente',
+                data: {{ point_of_sale_values|safe }},
+                backgroundColor: ['rgba(255, 99, 132, 0.2)', 'rgba(54, 162, 235, 0.2)', 'rgba(255, 206, 86, 0.2)'],
+                borderColor: ['rgba(255, 99, 132, 1)', 'rgba(54, 162, 235, 1)', 'rgba(255, 206, 86, 1)'],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: false,
+            maintainAspectRatio: false
+        }
+    });
+});
+</script>
 
 {% endblock %}
