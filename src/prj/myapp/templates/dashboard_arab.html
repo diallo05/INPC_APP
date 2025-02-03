@@ -1,31 +1,30 @@
-{% extends 'base.html' %}
+{% extends 'base_ar.html' %}
 
 {% block content %}
 <div class="container">
-    <!-- Sélecteur d'année -->
+    <!-- تحديد السنة -->
     <div class="row mb-4">
         <div class="col-md-8 text-center">
-            <label for="yearFilter" class="form-label">Sélectionner une année :</label>
+            <label for="yearFilter" class="form-label">اختر السنة :</label>
             <select id="yearFilter" class="form-select w-25 d-inline">
-                <option value="">Toutes les années</option>
+                <option value="">كل السنوات</option>
                 {% for year in available_years %}
                     <option value="{{ year }}" {% if year|stringformat:"s" == selected_year %}selected{% endif %}>{{ year }}</option>
                 {% endfor %}
             </select>
         </div>
         <div class="col-md-4 text-end">
-            <button id="generateReport" class="btn btn-primary">Générer un Rapport</button>
+            <button id="generateReport" class="btn btn-primary">إنشاء تقرير</button>
         </div>
     </div>
     
-
-    <!-- Cartes de statistiques -->
+    <!-- بطاقات الإحصائيات -->
     <div class="row">
         <div class="col-md-3 mb-4 d-flex">
             <div class="card flex-fill shadow-sm">
                 <div class="card-body text-center">
                     <i class="fas fa-city fa-3x text-primary mb-3"></i>
-                    <h5 class="card-title">Communes</h5>
+                    <h5 class="card-title">البلديات</h5>
                     <p class="card-text display-4">{{ commune_count }}</p>
                 </div>
             </div>
@@ -34,7 +33,7 @@
             <div class="card flex-fill shadow-sm">
                 <div class="card-body text-center">
                     <i class="fas fa-map-marked-alt fa-3x text-success mb-3"></i>
-                    <h5 class="card-title">Wilayas</h5>
+                    <h5 class="card-title">الولايات</h5>
                     <p class="card-text display-4">{{ wilaya_count }}</p>
                 </div>
             </div>
@@ -43,7 +42,7 @@
             <div class="card flex-fill shadow-sm">
                 <div class="card-body text-center">
                     <i class="fas fa-map-pin fa-3x text-warning mb-3"></i>
-                    <h5 class="card-title">Moughataas</h5>
+                    <h5 class="card-title">المقاطعات</h5>
                     <p class="card-text display-4">{{ moughataa_count }}</p>
                 </div>
             </div>
@@ -52,69 +51,63 @@
             <div class="card flex-fill shadow-sm">
                 <div class="card-body text-center">
                     <i class="fas fa-shopping-basket fa-3x text-danger mb-3"></i>
-                    <h5 class="card-title">Produits</h5>
+                    <h5 class="card-title">المنتجات</h5>
                     <p class="card-text display-4">{{ product_count }}</p>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Graphiques -->
+    <!-- الرسوم البيانية -->
     <div class="row">
         <div class="col-md-12">
-            <h5 class="text-center">Indice des Prix à la Consommation (IPC)</h5>
+            <h5 class="text-center">مؤشر أسعار المستهلك (CPI)</h5>
             <canvas id="ipcChart" style="height: 400px;"></canvas>
         </div>
     </div>
 
     <div class="row">
         <div class="col-md-12">
-            <h5 class="text-center">Répartition des Produits par Type</h5>
+            <h5 class="text-center">توزيع المنتجات حسب النوع</h5>
             <canvas id="productTypeChart" style="height: 400px;"></canvas>
         </div>
     </div>
 
     <div class="row">
         <div class="col-md-12 text-center">
-            <label for="moughataaFilter" class="form-label">Filtrer par Moughataa :</label>
+            <label for="moughataaFilter" class="form-label">تصفية حسب المقاطعة :</label>
             <select id="moughataaFilter" class="form-select w-25 d-inline">
-                <option value="">Toutes les Moughataas</option>
+                <option value="">كل المقاطعات</option>
                 {% for moughataa in available_moughataas %}
                     <option value="{{ moughataa.id }}" {% if moughataa.id|stringformat:"s" == selected_moughataa %}selected{% endif %}>{{ moughataa.label }}</option>
                 {% endfor %}
             </select>
         </div>
         <div class="col-md-12">
-            <h5 class="text-center">Répartition des Points de Vente par Commune</h5>
+            <h5 class="text-center">توزيع نقاط البيع حسب البلدية</h5>
             <canvas id="pointOfSaleChart" style="height: 400px;"></canvas>
         </div>
     </div>
 
     <div class="row">
         <div class="col-md-12">
-            <h5 class="text-center">Évolution des Prix des Produits</h5>
-            <canvas id="priceEvolutionChart" style="height: 400px;"></canvas>
+            <h5 class="text-center">تطور أسعار المنتجات</h5>
+            <canvas id="priceEvolutionChart" style="height: 500px;"></canvas>
         </div>
     </div>
 
-    <!-- Carte des points de vente -->
+    <!-- خريطة نقاط البيع -->
     <div class="row">
         <div class="col-md-12">
-            <h5 class="text-center">Carte des Points de Vente</h5>
+            <h5 class="text-center">خريطة نقاط البيع</h5>
             <div id="map" style="height: 500px;"></div>
         </div>
     </div>
 </div>
-
-<!-- Inclure Chart.js et Leaflet -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
-<!-- Script pour la mise à jour des graphiques -->
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-    // Filtrer par année et recharger la page
     document.getElementById("yearFilter").addEventListener("change", function() {
         let selectedYear = this.value;
         let url = new URL(window.location.href);
@@ -150,7 +143,7 @@ document.addEventListener("DOMContentLoaded", function() {
         data: {
             labels: {{ product_type_labels|safe }},
             datasets: [{
-                label: 'عدد المنتجات',
+                label: 'Nombre de Produits',
                 data: {{ product_type_values|safe }},
                 backgroundColor: 'rgba(75, 192, 192, 0.2)',
                 borderColor: 'rgba(75, 192, 192, 1)',
@@ -227,7 +220,7 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
  // Action de génération du rapport
- document.getElementById('generateReport').addEventListener('click', function() {
+    document.getElementById('generateReport').addEventListener('click', function() {
         window.location.href = '{% url "generate_report" %}'; // Redirection vers la vue de génération du rapport
     });
 </script>

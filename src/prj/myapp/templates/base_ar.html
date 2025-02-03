@@ -220,31 +220,31 @@
     </div>
     <ul class="menu">
       <li>
-        <a href="{% url 'excel_import' %}"><i class="fas fa-chart-bar"></i> Data Sets</a>
+        <a href="{% url 'excel_import' %}"><i class="fas fa-chart-bar"></i> مجموعات البيانات</a>
       </li>
       <li>
-        <a href="{% url 'calculate_inpc' %}"><i class="fas fa-chart-bar"></i> INPC</a>
+        <a href="{% url 'calculate_inpc' %}"><i class="fas fa-chart-bar"></i> مؤشر الأسعار</a>
       </li>
       <li class="menu-item">
-        <a href="#" class="dropdown-toggle" id="products-toggle"><i class="fas fa-box"></i> Products</a>
+        <a href="#" class="dropdown-toggle" id="products-toggle"><i class="fas fa-box"></i> المنتجات</a>
         <ul class="dropdown" id="products-dropdown">
-          <li><a href="{% url 'product_list' %}">Produit</a></li>
-          <li><a href="{% url 'cart_list' %}">Panier</a></li>
-          <li><a href="{% url 'productprice_list' %}">Prix</a></li>
-          <li><a href="{% url 'pointVente_list' %}">Point de vente</a></li>
-          <li><a href="{% url 'cartproduct_list' %}">Cart product</a></li>
+          <li><a href="{% url 'product_list' %}">المنتجات</a></li>
+          <li><a href="{% url 'cart_list' %}">السلة</a></li>
+          <li><a href="{% url 'productprice_list' %}">الأسعار</a></li>
+          <li><a href="{% url 'pointVente_list' %}">نقاط البيع</a></li>
+          <li><a href="{% url 'cartproduct_list' %}">منتجات السلة</a></li>
         </ul>
       </li>
       <li class="menu-item">
-        <a href="#" class="dropdown-toggle" id="structure-toggle"><i class="fas fa-sitemap"></i> Structure</a>
+        <a href="#" class="dropdown-toggle" id="structure-toggle"><i class="fas fa-sitemap"></i> الهيكل</a>
         <ul class="dropdown" id="structure-dropdown">
-          <li><a href="{% url 'wilaya_list' %}">Wilaya</a></li>
-          <li><a href="{% url 'commune_list' %}">Commune</a></li>
-          <li><a href="{% url 'moughataa_list' %}">Moughataa</a></li>
+          <li><a href="{% url 'wilaya_list' %}">الولايات</a></li>
+          <li><a href="{% url 'commune_list' %}">البلديات</a></li>
+          <li><a href="{% url 'moughataa_list' %}">المقاطعات</a></li>
         </ul>
       </li>
       <li>
-        <a href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Log Out</a>
+        <a href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> تسجيل الخروج</a>
       </li>
     </ul>
   </aside>
@@ -257,7 +257,7 @@
         <a href="https://web.facebook.com/ansade.rim" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
         <a href="https://ansade.mr/fr/#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
         <a href="https://www.linkedin.com/" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
-        <a href="{% url 'dashboard_arab' %}" aria-label="Version Arabe">العربية</a>
+        <a href="{% url 'home' %}" aria-label="Version Arabe">Français</a>
       </nav>
     </header>
 
@@ -267,7 +267,7 @@
 
     <footer class="footer">
       <p>&copy; 2023 ANSADE. Tous droits réservés.</p>
-      <p>Nombre de visiteurs : <span id="visitor-count">0</span></p>
+      <p>عدد الزوار: <span id="visitor-count">0</span></p>
     </footer>
 
     <script>
