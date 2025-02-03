@@ -146,5 +146,5 @@ LOGIN_REDIRECT_URL = '/'
 
 LOGOUT_REDIRECT_URL = '/'
 
-CSRF_TRUSTED_ORIGINS= ['http://138.201.52.29:25216', 'http://teaching.sidi.xyz:2526']
+CSRF_TRUSTED_ORIGINS= ['http://138.201.52.29:25216', 'http://teaching.sidi.xyz:25216']
 
