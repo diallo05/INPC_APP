@@ -10,7 +10,7 @@
     {% csrf_token %}
     <p class="h5 p-3">Are you sure you want to delete "{{ object }}"?</p>
     <input type="submit" value="Confirm" class="btn btn-danger"/>
-    <a href="{% url 'producttype_list' %}" class="btn btn-secondary">Cancel</a>
+    <a href="{% url 'wilaya_list' %}" class="btn btn-secondary">Cancel</a>
 </form>
 
 {% endblock %}
