@@ -303,8 +303,8 @@ def calculate_inpc(request):
 
         for m in range(1, 13):  # Boucle sur les 12 mois
             current_date = datetime(year, m, 1).date()
-            total_cost = 0
-            reference_cost = 0
+            total_cost = 1
+            reference_cost = 1
 
             for cart_product in cart_products:
                 # Récupérer le prix du produit pour le mois courant

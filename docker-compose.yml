@@ -8,7 +8,7 @@ services:
       - ./src:/app
     working_dir: /app
     ports:
-      - "127.0.0.1:25216:8000"
+      - "127.0.0.1:23216:8000"
     depends_on:
       db_23216:
         condition: service_healthy
